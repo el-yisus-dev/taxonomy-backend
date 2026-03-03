@@ -239,7 +239,7 @@ It is an exploration of:
 * Secure, collaborative systems
 * AI-human interaction in scientific contexts
 * Building production-grade software from first principles
-
+Jalando ando xd
 ---
 
 If you’re interested in contributing, discussing ideas, or reviewing the architecture, feel free to open an issue.
