@@ -2,38 +2,45 @@
 
 
 ```bash
+User
+ ├── id (PK)
+ ├── email (unique)
+ ├── password
+ ├── role (ENUM: user, moderator)
+ ├── cellphone
+ ├── createdAt
+ ├── updatedAt
+ ├── deletedAt (nullable)
+
 Taxon
- ├── id
+ ├── id (PK)
  ├── name
  ├── rank (ENUM)
  ├── parentId (nullable FK -> Taxon.id)
  ├── conservationStatus (ENUM)
- ├── images (JSON / ARRAY STRING)
  ├── createdAt
  ├── updatedAt
  ├── deletedAt (nullable)
 
 Observation
- ├── id
- ├── taxonId (nullable FK -> Taxon.id)
+ ├── id (PK)
  ├── userId (FK -> User.id)
+ ├── taxonId (nullable FK -> Taxon.id)  ← consenso final
  ├── latitude
  ├── longitude
  ├── imageUrl
- ├── status (ENUM: pending, under_review, identified)
+ ├── status (ENUM: pending, identified)
  ├── observedAt
  ├── createdAt
  ├── updatedAt
  ├── deletedAt (nullable)
 
-User
- ├── id
- ├── email (unique)
- ├── password
- ├── cellphone
+Identification
+ ├── id (PK)
+ ├── observationId (FK -> Observation.id)
+ ├── taxonId (FK -> Taxon.id)
+ ├── userId (FK -> User.id)
  ├── createdAt
- ├── updatedAt
- ├── deletedAt (nullable)
 
 ```
 
@@ -41,44 +48,57 @@ User
 
 **Tabla:** Taxon
 
-| Columna             | Tipo                                   | Null | Clave / Comentario                               |
-|--------------------|---------------------------------------|------|--------------------------------------------------|
-| id                  | INTEGER                               | NO   | PK, autoincremental                               |
-| name                | STRING                                | NO   | Nombre del taxón                                  |
-| rank                | ENUM                                  | NO   | "kingdom","phylum","class","order","family","genus","species" |
-| parentId            | INTEGER                               | SÍ   | FK -> Taxon.id (autorreferencia para jerarquía) |
-| conservationStatus  | ENUM                                  | SÍ   | "LC","NT","CD","VU","EN","CR","EW","EX","DD","NE" |
-| images              | JSON / ARRAY STRING                    | SÍ   | URLs de imágenes                                  |
-| createdAt           | DATETIME                              | NO   | Fecha de creación                                 |
-| updatedAt           | DATETIME                              | NO   | Fecha de actualización                             |
-| deletedAt           | DATETIME                              | SÍ   | Fecha de eliminación lógica (paranoid)          |
+| Campo              | Tipo     | Descripción                                           |
+| ------------------ | -------- | ----------------------------------------------------- |
+| id                 | INTEGER  | PK                                                    |
+| name               | STRING   | Nombre científico                                     |
+| rank               | ENUM     | kingdom, phylum, class, order, family, genus, species |
+| parentId           | INTEGER  | FK autorreferencial                                   |
+| conservationStatus | ENUM     | LC, NT, VU, EN, CR, EW, EX, DD, NE                    |
+| createdAt          | DATETIME |                                                       |
+| updatedAt          | DATETIME |                                                       |
+| deletedAt          | DATETIME | Soft delete                                           |
 
 # Observation
 
 **Tabla:** Observation
-| Columna    | Tipo         | Null | Clave / Comentario                                    |
-| ---------- | ------------ | ---- | ----------------------------------------------------- |
-| id         | INTEGER      | NO   | PK, autoincremental                                   |
-| taxonId    | INTEGER      | SÍ   | FK -> Taxon.id, puede ser nulo si aún no identificado |
-| userId     | INTEGER      | NO   | FK -> User.id                                         |
-| latitude   | DECIMAL(9,6) | NO   | Latitud de la observación                             |
-| longitude  | DECIMAL(9,6) | NO   | Longitud de la observación                            |
-| imageUrl   | STRING       | SÍ   | URL de la foto tomada                                 |
-| status     | ENUM         | NO   | "pending", "under_review", "identified"               |
-| observedAt | DATETIME     | NO   | Fecha en que se realizó la observación                |
-| createdAt  | DATETIME     | NO   | Fecha de creación                                     |
-| updatedAt  | DATETIME     | NO   | Fecha de actualización                                |
-| deletedAt  | DATETIME     | SÍ   | Fecha de eliminación lógica                           |
+| Campo      | Tipo         | Descripción                  |
+| ---------- | ------------ | ---------------------------- |
+| id         | INTEGER      | PK                           |
+| userId     | INTEGER      | FK obligatorio               |
+| taxonId    | INTEGER      | FK nullable (consenso final) |
+| latitude   | DECIMAL(9,6) | Precisión ~10cm              |
+| longitude  | DECIMAL(9,6) |                              |
+| imageUrl   | STRING       | URL almacenamiento externo   |
+| status     | ENUM         | pending, identified          |
+| observedAt | DATETIME     | Fecha real del evento        |
+| createdAt  | DATETIME     |                              |
+| updatedAt  | DATETIME     |                              |
+| deletedAt  | DATETIME     | Soft delete                  |
+
 
 # User
 
 **Table:** User
-| Columna   | Tipo     | Null | Clave / Comentario          |
-| --------- | -------- | ---- | --------------------------- |
-| id        | INTEGER  | NO   | PK, autoincremental         |
-| email     | STRING   | NO   | Único, correo del usuario   |
-| password  | STRING   | NO   | Hash de la contraseña       |
-| cellphone | STRING   | SÍ   | Número de celular           |
-| createdAt | DATETIME | NO   | Fecha de creación           |
-| updatedAt | DATETIME | NO   | Fecha de actualización      |
-| deletedAt | DATETIME | SÍ   | Fecha de eliminación lógica |
+| Campo     | Tipo     | Restricciones    |
+| --------- | -------- | ---------------- |
+| id        | INTEGER  | PK               |
+| email     | STRING   | UNIQUE, NOT NULL |
+| password  | STRING   | NOT NULL (hash)  |
+| role      | ENUM     | user / moderator |
+| cellphone | STRING   | Opcional         |
+| createdAt | DATETIME | NOT NULL         |
+| updatedAt | DATETIME | NOT NULL         |
+| deletedAt | DATETIME | Soft delete      |
+
+# Identification
+**Table:** Identification
+
+| Campo         | Tipo     | Descripción    |
+| ------------- | -------- | -------------- |
+| id            | INTEGER  | PK             |
+| observationId | INTEGER  | FK obligatorio |
+| taxonId       | INTEGER  | FK obligatorio |
+| userId        | INTEGER  | FK obligatorio |
+| createdAt     | DATETIME |                |
+
