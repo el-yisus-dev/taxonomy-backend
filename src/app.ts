@@ -1,8 +1,7 @@
 import express from "express";
 
+import { config } from "./config/config.js";
 const app = express();
-
-const port = 9222;
 
 // Middleware to response in json format 
 app.use(express.json());
@@ -18,6 +17,6 @@ app.get("/", (req, res) => {
 })
 
 
-app.listen(port, () => {
-    console.log(`working on: http://localhost:${port}`);
+app.listen(config.PORT, () => {
+    console.log(`working on: http://localhost:${config.PORT}`);
 })
