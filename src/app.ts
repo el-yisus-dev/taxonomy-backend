@@ -10,7 +10,7 @@ const app = express();
 // Middleware to response in json format 
 app.use(express.json());
 
-app.use(morgan("tiny"));
+app.use(morgan("dev"));
 
 app.get("/", (req, res) => {
     res.status(200).json({
