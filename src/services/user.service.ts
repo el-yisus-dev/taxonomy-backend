@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 
 import * as userRepository from "../repositories/user.repository.js";
+import { ApiError } from "../utils/ApiError.js";
 
 export const createUser = async (data: {
   email: string
@@ -11,7 +12,7 @@ export const createUser = async (data: {
   const existingUser = await userRepository.findUserByEmail(data.email)
 
   if (existingUser) {
-    throw new Error("Email already registered")
+    throw new ApiError(409, "Email already registered");
   }
 
   const hashedPassword = await bcrypt.hash(data.password, 10)

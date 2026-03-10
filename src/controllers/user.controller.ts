@@ -2,13 +2,16 @@ import type { Request, Response } from "express"
 import * as userService from "../services/user.service.js"
 
 export const createUser = async (req: Request, res: Response) => {
-  try {
-    const user = await userService.createUser(req.body)
+  const { email, password, cellphone } = req.body
 
-    res.status(201).json(user)
-  } catch (error) {
-    res.status(400).json({ error: (error as Error).message })
-  }
+  await userService.createUser({ email, password, cellphone })
+
+  return res.status(201).json({
+    status: "success",
+    data: {
+      message: "User created successfully"
+    }
+  })
 }
 
 export const getUsers = async (req: Request, res: Response) => {

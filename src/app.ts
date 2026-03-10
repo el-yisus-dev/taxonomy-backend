@@ -2,8 +2,9 @@ import express from "express";
 import morgan from "morgan";
 
 
-import { routerApi } from "./routes/index.routes.js";
 import { config } from "./config/config.js";
+import { routerApi } from "./routes/index.routes.js";
+import { errorMiddleware } from "./middleware/error.middleware.js";
 
 const app = express();
 
@@ -22,6 +23,10 @@ app.get("/", (req, res) => {
 })
 
 routerApi(app);
+
+// Middleware to handle errors
+
+app.use(errorMiddleware);
 
 app.listen(config.PORT, () => {
     console.log(`working on: http://localhost:${config.PORT}`);
