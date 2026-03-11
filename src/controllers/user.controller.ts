@@ -15,20 +15,32 @@ export const createUser = async (req: Request, res: Response) => {
 }
 
 export const getUsers = async (req: Request, res: Response) => {
-  const users = await userService.getUsers()
-  res.json(users)
+  const users = await userService.getUsers();
+
+  res.json({
+    status: "success",
+    data: users
+  })
 }
 
+export const updateUser = async (req: Request, res: Response) => {
+  res.status(302).json({
+    status: "success",
+    data: {
+      message: "User updated successfully"
+    }
+  })
+};
+
 export const getUserById = async (req: Request, res: Response) => {
-  try {
     const id = Number(req.params.id)
 
     const user = await userService.getUserById(id)
 
-    res.json(user)
-  } catch (error) {
-    res.status(404).json({ error: (error as Error).message })
-  }
+    res.json({
+      status: "success",
+      data: user
+    })
 }
 
 export const deleteUser = async (req: Request, res: Response) => {

@@ -1,7 +1,6 @@
 import express from "express";
 import morgan from "morgan";
 
-
 import { config } from "./config/config.js";
 import { routerApi } from "./routes/index.routes.js";
 import { errorMiddleware } from "./middleware/error.middleware.js";
@@ -13,19 +12,10 @@ app.use(express.json());
 
 app.use(morgan("dev"));
 
-app.get("/", (req, res) => {
-    res.status(200).json({
-        "status": "exito",
-        data: {
-            message: "First steps master in the app u.ur"
-        }
-    })
-})
-
+// Routes
 routerApi(app);
 
 // Middleware to handle errors
-
 app.use(errorMiddleware);
 
 app.listen(config.PORT, () => {
