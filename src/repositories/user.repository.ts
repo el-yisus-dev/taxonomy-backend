@@ -2,10 +2,13 @@ import { prisma } from "../lib/prisma.js"
 
 export const createUser = async (data: {
   email: string
+  username: string
+  name: string
+  lastName: string
   password: string
-  role?: "USER" | "MODERATOR"
   cellphone?: string
 }) => {
+
   return prisma.user.create({
     data
   })
@@ -17,14 +20,40 @@ export const findUserByEmail = async (email: string) => {
   })
 }
 
+export const findUserByUsername = async (username: string) => {
+  return prisma.user.findUnique({
+    where: { username }
+  })
+}
+
 export const findUserById = async (id: number) => {
   return prisma.user.findUnique({
     where: { id }
   })
 }
 
-export const findAllUsers = async () => {
+export const findAllUsers = async ({
+  skip,
+  limit
+}: {
+  skip: number
+  limit: number
+}) => {
+
   return prisma.user.findMany({
+    where: {
+      deletedAt: null
+    },
+    skip,
+    take: limit,
+    orderBy: {
+      createdAt: "desc"
+    }
+  })
+}
+
+export const countUsers = async () => {
+  return prisma.user.count({
     where: {
       deletedAt: null
     }

@@ -1,25 +1,32 @@
 import type { Request, Response } from "express"
 import * as userService from "../services/user.service.js"
+import { getPagination } from "../utils/Pagination.js"
 
 export const createUser = async (req: Request, res: Response) => {
-  const { email, password, cellphone } = req.body
 
-  await userService.createUser({ email, password, cellphone })
+  const user = await userService.createUser(req.body)
 
   return res.status(201).json({
     status: "success",
     data: {
-      message: "User created successfully"
+      user
     }
   })
 }
 
 export const getUsers = async (req: Request, res: Response) => {
-  const users = await userService.getUsers();
+  const { page, limit, skip } = getPagination(req.query)
+  
+  const result = await userService.getUsers({
+    page,
+    limit,
+    skip
+  })
 
   res.json({
     status: "success",
-    data: users
+    data: result.items,
+    meta: result.meta
   })
 }
 

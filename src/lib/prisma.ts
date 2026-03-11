@@ -1,13 +1,11 @@
 import { PrismaClient } from "@prisma/client"
 import { PrismaPg } from "@prisma/adapter-pg"
-import { Pool } from "pg"
 import { config } from "../config/config.js"
 
-const pool = new Pool({
-  connectionString: config.DB_URL
-})
 
-const adapter = new PrismaPg(pool)
+const adapter = new PrismaPg({
+  connectionString: config.DB_URL 
+})
 
 export const prisma = new PrismaClient({
   adapter
