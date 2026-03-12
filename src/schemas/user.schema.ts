@@ -44,6 +44,6 @@ export const updateUserSchema = z.object({
     .optional()
 })
   .refine(data => Object.keys(data).length > 0, {
-    message: "Please provide the data that you want to submit",
+    message: "Please provide the data that you want to submit"
 })
 .strict();

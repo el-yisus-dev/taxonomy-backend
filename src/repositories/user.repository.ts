@@ -17,19 +17,52 @@ export const createUser = async (data: {
 
 export const findUserByEmail = async (email: string) => {
   return prisma.user.findUnique({
-    where: { email }
+    where: { email },
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      name: true,
+      lastName: true,
+      cellphone: true,
+      avatarUrl: true,
+      role: true,
+      createdAt: true
+    }
   })
 };
 
 export const findUserByUsername = async (username: string) => {
   return prisma.user.findUnique({
-    where: { username }
+    where: { username },
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      name: true,
+      lastName: true,
+      cellphone: true,
+      avatarUrl: true,
+      role: true,
+      createdAt: true
+    }
   })
 };
 
 export const findUserById = async (id: number) => {
   return prisma.user.findUnique({
-    where: { id }
+    where: { id },
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      name: true,
+      lastName: true,
+      cellphone: true,
+      avatarUrl: true,
+      role: true,
+      createdAt: true
+    }
   })
 };
 
@@ -46,6 +79,17 @@ export const findAllUsers = async ({
     take: limit,
     orderBy: {
       createdAt: "desc"
+    },
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      name: true,
+      lastName: true,
+      cellphone: true,
+      avatarUrl: true,
+      role: true,
+      createdAt: true
     }
   })
 };
@@ -63,7 +107,10 @@ export const updateUser = async (id: number, data: Partial<{ name: string; lastN
 
 export const softDeleteUser = async (id: number) => {
   return prisma.user.update({
-    where: { id },
+    where: { 
+      id,
+      deletedAt: null 
+    },
     data: {
       deletedAt: new Date(),
       isActive: false
