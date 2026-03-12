@@ -16,8 +16,6 @@ export const errorMiddleware = (
     })
   }
 
-  console.error(err)
-
   return res.status(500).json({
     status: "error",
     message: "Internal Server Error"
