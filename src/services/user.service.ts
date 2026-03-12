@@ -3,18 +3,11 @@ import bcrypt from "bcrypt";
 import * as userRepository from "../repositories/user.repository.js";
 import { ApiError } from "../utils/ApiError.js";
 import { getTotalPages } from "../utils/Pagination.js";
+import type { CreateUserDTO } from "../types/User.js";
 
-interface CreateUserDTO {
-  email: string
-  username: string
-  name: string
-  lastName: string
-  password: string
-  cellphone?: string
-}
 
 export const createUser = async (data: CreateUserDTO) => {
-
+  
   const existingEmail = await userRepository.findUserByEmail(data.email)
 
   if (existingEmail) {
@@ -34,7 +27,7 @@ export const createUser = async (data: CreateUserDTO) => {
     password: hashedPassword
   })
   
-  const { password, ...safeUser } = user;
+  const { password , ...safeUser } = user;
 
   return safeUser
 }
@@ -54,10 +47,14 @@ export const getUsers = async ({
     userRepository.countUsers()
   ])
 
-  const totalPages = getTotalPages(limit, total)
+  const totalPages = getTotalPages(total, limit);
+  const safeUsers = users.map( user => {
+      const { password, ...safeUser } = user
+      return safeUser
+  })
 
   return {
-    items: users,
+    items: safeUsers,
     meta: {
       page,
       limit,
@@ -71,10 +68,11 @@ export const getUserById = async (id: number) => {
   const user = await userRepository.findUserById(id)
 
   if (!user) {
-    throw new Error("User not found")
+    throw new ApiError(404, "Username not found")  
   }
-
-  return user
+  const { password, ...safeUser } = user;
+  
+  return safeUser
 }
 
 export const deleteUser = async (id: number) => {

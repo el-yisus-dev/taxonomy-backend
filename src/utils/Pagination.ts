@@ -1,10 +1,5 @@
-type QueryParam = string | undefined
+import type { Pagination, QueryParam } from "../types/Query.js"
 
-interface Pagination {
-  page: number
-  limit: number
-  skip: number
-}
 
 const DEFAULT_PAGE = 1
 const DEFAULT_LIMIT = 10

@@ -4,14 +4,12 @@ import type { ZodType } from "zod"
 
 import { ApiError } from "../utils/ApiError.js"
 
-
-export const validate = (schema: ZodType) => {
+export const validate = (schema: ZodType, property: "body" | "params" | "query" = "body") => {
   return (req: Request, res: Response, next: NextFunction) => {
 
-    const result = schema.safeParse(req.body)
+    const result = schema.safeParse(req[property])
 
     if (!result.success) {
-
       const errors = result.error.issues.map(issue => ({
         field: issue.path.join("."),
         message: issue.message
@@ -20,7 +18,8 @@ export const validate = (schema: ZodType) => {
       throw new ApiError(400, "Validation error", errors)
     }
 
-    req.body = result.data
+    req[property] = result.data
+
     next()
   }
 }

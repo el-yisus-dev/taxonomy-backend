@@ -26,4 +26,4 @@ export const createUserSchema = z.object({
     .string()
     .regex(/^\+?[0-9]{10,15}$/, "Invalid phone number")
     .optional()
-})
+}).strict();

@@ -3,7 +3,7 @@ import * as userService from "../services/user.service.js"
 import { getPagination } from "../utils/Pagination.js"
 
 export const createUser = async (req: Request, res: Response) => {
-
+  
   const user = await userService.createUser(req.body)
 
   return res.status(201).json({
