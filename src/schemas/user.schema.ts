@@ -27,3 +27,23 @@ export const createUserSchema = z.object({
     .regex(/^\+?[0-9]{10,15}$/, "Invalid phone number")
     .optional()
 }).strict();
+
+
+export const updateUserSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Name is too short")
+    .optional(),
+  lastName: z
+    .string()
+    .min(1, "LastName is too short")
+    .optional(),
+  cellphone: z
+    .string()
+    .regex(/^(\+52\s?)?(\d{2,3}-?\d{3}-?\d{4})$/, "Invalid phone number")
+    .optional()
+})
+  .refine(data => Object.keys(data).length > 0, {
+    message: "Please provide the data that you want to submit",
+})
+.strict();

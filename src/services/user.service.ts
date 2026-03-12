@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import * as userRepository from "../repositories/user.repository.js";
 import { ApiError } from "../utils/ApiError.js";
 import { getTotalPages } from "../utils/Pagination.js";
-import type { CreateUserDTO } from "../types/User.js";
+import type { CreateUserDTO, updateUserDTO } from "../types/User.js";
 
 
 export const createUser = async (data: CreateUserDTO) => {
@@ -30,7 +30,7 @@ export const createUser = async (data: CreateUserDTO) => {
   const { password , ...safeUser } = user;
 
   return safeUser
-}
+};
 
 export const getUsers = async ({
   page,
@@ -62,7 +62,7 @@ export const getUsers = async ({
       totalPages
     }
   }
-}
+};
 
 export const getUserById = async (id: number) => {
   const user = await userRepository.findUserById(id)
@@ -73,8 +73,28 @@ export const getUserById = async (id: number) => {
   const { password, ...safeUser } = user;
   
   return safeUser
-}
+};
+
+export const updateUser = async (id: number, data: updateUserDTO) => {
+  const existingUser = await userRepository.findUserById(id);
+  if (!existingUser) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const updatedUser = await userRepository.updateUser(id, data);
+
+  const { password, ...safeUser } = updatedUser;
+  
+  return safeUser;
+
+};
 
 export const deleteUser = async (id: number) => {
+  const existingUser = await userRepository.findUserById(id);
+  
+  if (!existingUser) {
+    throw new ApiError(404, "User not found");
+  }
+
   return userRepository.softDeleteUser(id)
-}
+};

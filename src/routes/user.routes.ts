@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { createUser, deleteUser, getUserById, getUsers, updateUser } from "../controllers/user.controller.js";
 import { validate } from "../middleware/validate.middleware.js";
-import { createUserSchema } from "../schemas/user.schema.js";
+import { createUserSchema, updateUserSchema } from "../schemas/user.schema.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import { idParamSchema } from "../schemas/id.schema.js";
 
@@ -15,8 +15,8 @@ router.get("/", asyncHandler(getUsers));
 
 router.get("/:id", validate(idParamSchema, "params"), asyncHandler(getUserById));
 
-router.patch("/:id", asyncHandler(updateUser));
+router.put("/:id", validate(idParamSchema, "params"), validate(updateUserSchema), asyncHandler(updateUser));
 
-router.delete("/:id", asyncHandler(deleteUser));
+router.delete("/:id", validate(idParamSchema, "params"), asyncHandler(deleteUser));
 
 export default router

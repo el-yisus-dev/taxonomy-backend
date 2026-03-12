@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma.js"
+import type { updateUserDTO } from "../types/User.js";
 
 export const createUser = async (data: {
   email: string
@@ -12,25 +13,25 @@ export const createUser = async (data: {
   return prisma.user.create({
     data
   })
-}
+};
 
 export const findUserByEmail = async (email: string) => {
   return prisma.user.findUnique({
     where: { email }
   })
-}
+};
 
 export const findUserByUsername = async (username: string) => {
   return prisma.user.findUnique({
     where: { username }
   })
-}
+};
 
 export const findUserById = async (id: number) => {
   return prisma.user.findUnique({
     where: { id }
   })
-}
+};
 
 export const findAllUsers = async ({
   skip,
@@ -41,30 +42,31 @@ export const findAllUsers = async ({
 }) => {
 
   return prisma.user.findMany({
-    where: {
-      deletedAt: null
-    },
     skip,
     take: limit,
     orderBy: {
       createdAt: "desc"
     }
   })
-}
+};
 
 export const countUsers = async () => {
-  return prisma.user.count({
-    where: {
-      deletedAt: null
-    }
-  })
-}
+  return prisma.user.count();
+};
+
+export const updateUser = async (id: number, data: Partial<{ name: string; lastName: string; cellphone: string }>) => {
+  return prisma.user.update({
+    where: { id },
+    data,
+  });
+};
 
 export const softDeleteUser = async (id: number) => {
   return prisma.user.update({
     where: { id },
     data: {
-      deletedAt: new Date()
+      deletedAt: new Date(),
+      isActive: false
     }
   })
-}
+};

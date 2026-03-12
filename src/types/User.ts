@@ -6,3 +6,5 @@ export interface CreateUserDTO {
   password: string
   cellphone?: string
 }
+
+export interface updateUserDTO extends Partial<Pick<CreateUserDTO, "name" | "lastName" | "cellphone">> {}

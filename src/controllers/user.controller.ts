@@ -31,13 +31,17 @@ export const getUsers = async (req: Request, res: Response) => {
 }
 
 export const updateUser = async (req: Request, res: Response) => {
-  res.status(302).json({
-    status: "success",
-    data: {
-      message: "User updated successfully"
-    }
-  })
-};
+    const id = Number(req.params.id);
+    
+    await userService.updateUser(id, req.body);
+
+    return res.status(200).json({
+      status: "success",
+      data: {
+        message: "User updated sucessfully",
+      },
+    });
+}
 
 export const getUserById = async (req: Request, res: Response) => {
     const id = Number(req.params.id)
@@ -55,5 +59,10 @@ export const deleteUser = async (req: Request, res: Response) => {
 
   await userService.deleteUser(id)
 
-  res.status(204).send()
+  res.status(200).json({
+    status: "success",
+    data: {
+      message: "User deleted successfully"
+    }
+  })
 }
