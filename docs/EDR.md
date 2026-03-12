@@ -80,16 +80,24 @@ Identification
 # User
 
 **Table:** User
-| Campo     | Tipo     | Restricciones    |
-| --------- | -------- | ---------------- |
-| id        | INTEGER  | PK               |
-| email     | STRING   | UNIQUE, NOT NULL |
-| password  | STRING   | NOT NULL (hash)  |
-| role      | ENUM     | user / moderator |
-| cellphone | STRING   | Opcional         |
-| createdAt | DATETIME | NOT NULL         |
-| updatedAt | DATETIME | NOT NULL         |
-| deletedAt | DATETIME | Soft delete      |
+| Field         | Type     | Constraints        |
+| ------------- | -------- | ------------------ |
+| id            | INTEGER  | PK, Auto Increment |
+| email         | STRING   | UNIQUE, NOT NULL   |
+| username      | STRING   | UNIQUE, NOT NULL   |
+| name          | STRING   | NOT NULL           |
+| lastName      | STRING   | NOT NULL           |
+| password      | STRING   | NOT NULL (hashed)  |
+| role          | ENUM     | USER / MODERATOR   |
+| cellphone     | STRING   | Optional           |
+| avatarUrl     | STRING   | Optional           |
+| isActive      | BOOLEAN  | Default: true      |
+| emailVerified | BOOLEAN  | Default: false     |
+| lastLoginAt   | DATETIME | Optional           |
+| createdAt     | DATETIME | NOT NULL           |
+| updatedAt     | DATETIME | NOT NULL           |
+| deletedAt     | DATETIME | Soft delete        |
+
 
 # Identification
 **Table:** Identification
