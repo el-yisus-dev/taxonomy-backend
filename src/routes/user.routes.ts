@@ -192,10 +192,119 @@ router.post("/", validate(createUserSchema), asyncHandler(createUser));
  */
 router.get("/", asyncHandler(getUsers));
 
+/**
+ * @swagger
+ * /users/{id}:
+ *   get:
+ *     summary: Get user by ID
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: User ID
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: User retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ *       404:
+ *         description: User not found
+ */
 router.get("/:id", validate(idParamSchema, "params"), asyncHandler(getUserById));
 
+/**
+ * @swagger
+ * /users/{id}:
+ *   put:
+ *     summary: Update user information
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: User ID
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateUser'
+ *     responses:
+ *       200:
+ *         description: User updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: User updated successfully
+ *       404:
+ *         description: User not found
+ *       400:
+ *         description: Validation error
+ */
 router.put("/:id", validate(idParamSchema, "params"), validate(updateUserSchema), asyncHandler(updateUser));
 
+/**
+ * @swagger
+ * /users/{id}:
+ *   delete:
+ *     summary: Soft delete a user
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: User ID
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: User deleted successfully
+ *       404:
+ *         description: User not found
+ */
 router.delete("/:id", validate(idParamSchema, "params"), asyncHandler(deleteUser));
 
 export default router

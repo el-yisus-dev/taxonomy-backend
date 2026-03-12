@@ -48,13 +48,9 @@ export const getUsers = async ({
   ])
 
   const totalPages = getTotalPages(total, limit);
-  const safeUsers = users.map( user => {
-      const { password, ...safeUser } = user
-      return safeUser
-  })
 
   return {
-    items: safeUsers,
+    items: users,
     meta: {
       page,
       limit,
@@ -68,11 +64,9 @@ export const getUserById = async (id: number) => {
   const user = await userRepository.findUserById(id)
 
   if (!user) {
-    throw new ApiError(404, "Username not found")  
-  }
-  const { password, ...safeUser } = user;
-  
-  return safeUser
+    throw new ApiError(404, "User not found")  
+  }  
+  return user;
 };
 
 export const updateUser = async (id: number, data: updateUserDTO) => {
@@ -82,10 +76,8 @@ export const updateUser = async (id: number, data: updateUserDTO) => {
   }
 
   const updatedUser = await userRepository.updateUser(id, data);
-
-  const { password, ...safeUser } = updatedUser;
   
-  return safeUser;
+  return updatedUser;
 
 };
 

@@ -2,6 +2,8 @@ import swaggerJsdoc from "swagger-jsdoc";
 import { INFO } from "./swagger/info.js";
 import { SERVERS } from "./swagger/servers.js";
 import { SECURITY } from "./swagger/security.js";
+import SCHEMAS from './swagger/schemas/index.js';
+
 
 const swaggerOptions = {
     swaggerDefinition: {
@@ -10,6 +12,7 @@ const swaggerOptions = {
         servers: SERVERS,
         components: {
             securitySchemes: SECURITY,
+            schemas: SCHEMAS,
 
         }
     },
