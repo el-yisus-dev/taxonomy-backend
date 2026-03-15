@@ -15,9 +15,13 @@ export const createUser = async (data: {
   })
 };
 
-export const findUserByEmail = async (email: string) => {
+export const findUserByIdentifier = async (identifier: string) => {
+  const where = identifier.includes("@") 
+    ? { email: identifier } 
+    : { username: identifier };
+
   return prisma.user.findUnique({
-    where: { email },
+    where,
     select: {
       id: true,
       email: true,
@@ -27,14 +31,17 @@ export const findUserByEmail = async (email: string) => {
       cellphone: true,
       avatarUrl: true,
       role: true,
-      createdAt: true
-    }
-  })
+    },
+  });
 };
 
-export const findUserByUsername = async (username: string) => {
+export const findUserWithPassword = async (identifier: string) => {
+  const where = identifier.includes("@") 
+    ? { email: identifier } 
+    : { username: identifier };
+
   return prisma.user.findUnique({
-    where: { username },
+    where,
     select: {
       id: true,
       email: true,
@@ -44,9 +51,9 @@ export const findUserByUsername = async (username: string) => {
       cellphone: true,
       avatarUrl: true,
       role: true,
-      createdAt: true
-    }
-  })
+      password: true,
+    },
+  });
 };
 
 export const findUserById = async (id: number) => {
@@ -61,7 +68,6 @@ export const findUserById = async (id: number) => {
       cellphone: true,
       avatarUrl: true,
       role: true,
-      createdAt: true
     }
   })
 };
@@ -89,7 +95,8 @@ export const findAllUsers = async ({
       cellphone: true,
       avatarUrl: true,
       role: true,
-      createdAt: true
+      createdAt: true,
+      lastLoginAt: true
     }
   })
 };
@@ -100,10 +107,24 @@ export const countUsers = async () => {
 
 export const updateUser = async (id: number, data: Partial<{ name: string; lastName: string; cellphone: string }>) => {
   return prisma.user.update({
-    where: { id },
+    where: { 
+      id,
+      isActive: true
+    },
     data,
   });
 };
+
+export const updateLastLoginDate = async (id: number) => {
+  return prisma.user.update({
+    where: {
+      id
+    },
+    data: {
+      lastLoginAt: new Date()
+    }
+  })
+}
 
 export const softDeleteUser = async (id: number) => {
   return prisma.user.update({

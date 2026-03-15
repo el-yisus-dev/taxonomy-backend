@@ -47,3 +47,8 @@ export const updateUserSchema = z.object({
     message: "Please provide the data that you want to submit"
 })
 .strict();
+
+export const loginUserSchema = z.object({
+  identifier: z.string().nonempty("Username or email is required"),
+  password: z.string().nonempty("Password is required")
+});
