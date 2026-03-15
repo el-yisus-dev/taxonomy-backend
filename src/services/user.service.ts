@@ -8,13 +8,13 @@ import type { CreateUserDTO, updateUserDTO } from "../types/User.js";
 
 export const createUser = async (data: CreateUserDTO) => {
   
-  const existingEmail = await userRepository.findUserByEmail(data.email)
+  const existingEmail = await userRepository.findUserByIdentifier(data.email)
 
   if (existingEmail) {
     throw new ApiError(409, "Email already registered")
   }
 
-  const existingUsername = await userRepository.findUserByUsername(data.username)
+  const existingUsername = await userRepository.findUserByIdentifier(data.username)
 
   if (existingUsername) {
     throw new ApiError(409, "Username already taken")
