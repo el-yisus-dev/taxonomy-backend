@@ -16,6 +16,20 @@ export const errorMiddleware = (
     })
   }
 
+  if (err.name === "TokenExpiredError") {
+    return res.status(401).json({
+      status: "error",
+      message: "Token expired"
+    })
+  }
+
+  if (err.name === "JsonWebTokenError") {
+    return res.status(401).json({
+      status: "error",
+      message: "Invalid token"
+    })
+  }
+
   return res.status(500).json({
     status: "error",
     message: "Internal Server Error"

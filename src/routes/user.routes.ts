@@ -5,6 +5,7 @@ import { validate } from "../middleware/validate.middleware.js";
 import { createUserSchema, updateUserSchema } from "../schemas/user.schema.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import { idParamSchema } from "../schemas/id.schema.js";
+import { verifyToken } from "../middleware/auth.middleware.js";
 
 /**
  * @swagger
@@ -114,7 +115,8 @@ router.post("/", validate(createUserSchema), asyncHandler(createUser));
  *     description: Returns a paginated list of users
  *     tags:
  *       - Users
- *
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -190,7 +192,7 @@ router.post("/", validate(createUserSchema), asyncHandler(createUser));
  *       500:
  *         description: Internal server error
  */
-router.get("/", asyncHandler(getUsers));
+router.get("/", asyncHandler(verifyToken), asyncHandler(getUsers));
 
 /**
  * @swagger
