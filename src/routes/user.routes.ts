@@ -201,6 +201,8 @@ router.get("/", asyncHandler(verifyToken), asyncHandler(getUsers));
  *     summary: Get user by ID
  *     tags:
  *       - Users
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -225,7 +227,7 @@ router.get("/", asyncHandler(verifyToken), asyncHandler(getUsers));
  *       404:
  *         description: User not found
  */
-router.get("/:id", validate(idParamSchema, "params"), asyncHandler(getUserById));
+router.get("/:id", asyncHandler(verifyToken), validate(idParamSchema, "params"), asyncHandler(getUserById));
 
 /**
  * @swagger
@@ -234,6 +236,8 @@ router.get("/:id", validate(idParamSchema, "params"), asyncHandler(getUserById))
  *     summary: Update user information
  *     tags:
  *       - Users
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -270,7 +274,7 @@ router.get("/:id", validate(idParamSchema, "params"), asyncHandler(getUserById))
  *       400:
  *         description: Validation error
  */
-router.put("/:id", validate(idParamSchema, "params"), validate(updateUserSchema), asyncHandler(updateUser));
+router.put("/:id", asyncHandler(verifyToken) ,validate(idParamSchema, "params"), validate(updateUserSchema), asyncHandler(updateUser));
 
 /**
  * @swagger
@@ -279,6 +283,8 @@ router.put("/:id", validate(idParamSchema, "params"), validate(updateUserSchema)
  *     summary: Soft delete a user
  *     tags:
  *       - Users
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -307,6 +313,6 @@ router.put("/:id", validate(idParamSchema, "params"), validate(updateUserSchema)
  *       404:
  *         description: User not found
  */
-router.delete("/:id", validate(idParamSchema, "params"), asyncHandler(deleteUser));
+router.delete("/:id", asyncHandler(verifyToken), validate(idParamSchema, "params"), asyncHandler(deleteUser));
 
 export default router
