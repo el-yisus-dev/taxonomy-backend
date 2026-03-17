@@ -19,6 +19,9 @@ app.use(morgan("dev"));
 // Set up about swagger
 app.use("/api/v1/docs", swaggerUi.serve, swaggerUi.setup(swaggerJsdoc));
 
+// Dishable header powered-by
+app.disable('x-powered-by');
+
 // Routes
 routerApi(app);
 

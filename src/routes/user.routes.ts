@@ -6,6 +6,8 @@ import { createUserSchema, updateUserSchema } from "../schemas/user.schema.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import { idParamSchema } from "../schemas/id.schema.js";
 import { verifyToken } from "../middleware/auth.middleware.js";
+import { verifyRole } from "../middleware/acl.middleware.js";
+import { Role } from "../types/User.js";
 
 /**
  * @swagger
@@ -112,7 +114,7 @@ router.post("/", validate(createUserSchema), asyncHandler(createUser));
  * /users:
  *   get:
  *     summary: Get paginated list of users
- *     description: Returns a paginated list of users
+ *     description: Returns a paginated list of users (ADMIN only)
  *     tags:
  *       - Users
  *     security:
@@ -152,47 +154,18 @@ router.post("/", validate(createUserSchema), asyncHandler(createUser));
  *                 data:
  *                   type: array
  *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                         example: 1
- *                       email:
- *                         type: string
- *                         example: moon@example.com
- *                       username:
- *                         type: string
- *                         example: moonwalker
- *                       name:
- *                         type: string
- *                         example: Michael
- *                       lastName:
- *                         type: string
- *                         example: Jackson
- *                       cellphone:
- *                         type: string
- *                         example: "+5215512345678"
+ *                     $ref: '#/components/schemas/User'
  *
- *                 meta:
- *                   type: object
- *                   properties:
- *                     page:
- *                       type: integer
- *                       example: 1
- *                     limit:
- *                       type: integer
- *                       example: 10
- *                     total:
- *                       type: integer
- *                       example: 35
- *                     totalPages:
- *                       type: integer
- *                       example: 4
+ *       403:
+ *         description: Forbidden - insufficient permissions
+ *
+ *       401:
+ *         description: Unauthorized - missing or invalid token
  *
  *       500:
  *         description: Internal server error
  */
-router.get("/", asyncHandler(verifyToken), asyncHandler(getUsers));
+router.get("/", asyncHandler(verifyToken), asyncHandler(verifyRole([Role.ADMIN])), asyncHandler(getUsers));
 
 /**
  * @swagger

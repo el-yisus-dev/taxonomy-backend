@@ -12,4 +12,10 @@ export interface LoginData {
   password: string;
 }
 
+export enum Role {
+  USER = "USER",
+  MODERATOR = "MODERATOR",
+  ADMIN = "ADMIN",
+}
+
 export interface updateUserDTO extends Partial<Pick<CreateUserDTO, "name" | "lastName" | "cellphone">> {}
