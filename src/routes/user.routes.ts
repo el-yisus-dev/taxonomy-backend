@@ -5,6 +5,9 @@ import { validate } from "../middleware/validate.middleware.js";
 import { createUserSchema, updateUserSchema } from "../schemas/user.schema.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import { idParamSchema } from "../schemas/id.schema.js";
+import { verifyToken } from "../middleware/auth.middleware.js";
+import { verifyRole } from "../middleware/acl.middleware.js";
+import { Role } from "../types/User.js";
 
 /**
  * @swagger
@@ -111,10 +114,11 @@ router.post("/", validate(createUserSchema), asyncHandler(createUser));
  * /users:
  *   get:
  *     summary: Get paginated list of users
- *     description: Returns a paginated list of users
+ *     description: Returns a paginated list of users (ADMIN only)
  *     tags:
  *       - Users
- *
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -150,47 +154,18 @@ router.post("/", validate(createUserSchema), asyncHandler(createUser));
  *                 data:
  *                   type: array
  *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                         example: 1
- *                       email:
- *                         type: string
- *                         example: moon@example.com
- *                       username:
- *                         type: string
- *                         example: moonwalker
- *                       name:
- *                         type: string
- *                         example: Michael
- *                       lastName:
- *                         type: string
- *                         example: Jackson
- *                       cellphone:
- *                         type: string
- *                         example: "+5215512345678"
+ *                     $ref: '#/components/schemas/User'
  *
- *                 meta:
- *                   type: object
- *                   properties:
- *                     page:
- *                       type: integer
- *                       example: 1
- *                     limit:
- *                       type: integer
- *                       example: 10
- *                     total:
- *                       type: integer
- *                       example: 35
- *                     totalPages:
- *                       type: integer
- *                       example: 4
+ *       403:
+ *         description: Forbidden - insufficient permissions
+ *
+ *       401:
+ *         description: Unauthorized - missing or invalid token
  *
  *       500:
  *         description: Internal server error
  */
-router.get("/", asyncHandler(getUsers));
+router.get("/", asyncHandler(verifyToken), asyncHandler(verifyRole([Role.ADMIN])), asyncHandler(getUsers));
 
 /**
  * @swagger
@@ -199,6 +174,8 @@ router.get("/", asyncHandler(getUsers));
  *     summary: Get user by ID
  *     tags:
  *       - Users
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -223,7 +200,7 @@ router.get("/", asyncHandler(getUsers));
  *       404:
  *         description: User not found
  */
-router.get("/:id", validate(idParamSchema, "params"), asyncHandler(getUserById));
+router.get("/:id", asyncHandler(verifyToken), validate(idParamSchema, "params"), asyncHandler(getUserById));
 
 /**
  * @swagger
@@ -232,6 +209,8 @@ router.get("/:id", validate(idParamSchema, "params"), asyncHandler(getUserById))
  *     summary: Update user information
  *     tags:
  *       - Users
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -268,7 +247,7 @@ router.get("/:id", validate(idParamSchema, "params"), asyncHandler(getUserById))
  *       400:
  *         description: Validation error
  */
-router.put("/:id", validate(idParamSchema, "params"), validate(updateUserSchema), asyncHandler(updateUser));
+router.put("/:id", asyncHandler(verifyToken) ,validate(idParamSchema, "params"), validate(updateUserSchema), asyncHandler(updateUser));
 
 /**
  * @swagger
@@ -277,6 +256,8 @@ router.put("/:id", validate(idParamSchema, "params"), validate(updateUserSchema)
  *     summary: Soft delete a user
  *     tags:
  *       - Users
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -305,6 +286,6 @@ router.put("/:id", validate(idParamSchema, "params"), validate(updateUserSchema)
  *       404:
  *         description: User not found
  */
-router.delete("/:id", validate(idParamSchema, "params"), asyncHandler(deleteUser));
+router.delete("/:id", asyncHandler(verifyToken), validate(idParamSchema, "params"), asyncHandler(deleteUser));
 
 export default router

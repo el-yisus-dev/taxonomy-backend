@@ -15,7 +15,7 @@ export const createUser = async (req: Request, res: Response) => {
 }
 
 export const getUsers = async (req: Request, res: Response) => {
-  const { page, limit, skip } = getPagination(req.query)
+  const { page, limit, skip } = getPagination(req.query);
   
   const result = await userService.getUsers({
     page,
