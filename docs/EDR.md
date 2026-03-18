@@ -3,14 +3,21 @@
 
 ```bash
 User
- ├── id (PK)
- ├── email (unique)
- ├── password
- ├── role (ENUM: user, moderator)
- ├── cellphone
- ├── createdAt
- ├── updatedAt
- ├── deletedAt (nullable)
+ ├── id (PK, Auto Increment)
+ ├── email (unique, not null)
+ ├── username (unique, not null)
+ ├── name (not null)
+ ├── lastName (not null)
+ ├── password (not null, hashed)
+ ├── role (ENUM: USER, MODERATOR, ADMIN)
+ ├── cellphone (optional)
+ ├── avatarUrl (optional)
+ ├── isActive (default: true)
+ ├── emailVerified (default: false)
+ ├── lastLoginAt (optional)
+ ├── createdAt (not null)
+ ├── updatedAt (not null)
+ └── deletedAt (nullable, soft delete)
 
 Taxon
  ├── id (PK)
@@ -88,7 +95,7 @@ Identification
 | name          | STRING   | NOT NULL           |
 | lastName      | STRING   | NOT NULL           |
 | password      | STRING   | NOT NULL (hashed)  |
-| role          | ENUM     | USER / MODERATOR   |
+| role          | ENUM     | USER / MODERATOR / ADMIN   |
 | cellphone     | STRING   | Optional           |
 | avatarUrl     | STRING   | Optional           |
 | isActive      | BOOLEAN  | Default: true      |
