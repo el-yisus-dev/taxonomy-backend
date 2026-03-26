@@ -22,9 +22,11 @@ User
 Taxon
  ├── id (PK)
  ├── name
- ├── rank (ENUM)
+ ├── rank (ENUM: domain, kingdom, phylum, class, order, family, genus, species)
  ├── parentId (nullable FK -> Taxon.id)
- ├── conservationStatus (ENUM)
+ ├── description (nullable TEXT)
+ ├── validationStatus (ENUM: pending, validated, rejected)
+ ├── createdBy (FK -> User.id)
  ├── createdAt
  ├── updatedAt
  ├── deletedAt (nullable)
@@ -55,16 +57,19 @@ Identification
 
 **Tabla:** Taxon
 
-| Campo              | Tipo     | Descripción                                           |
-| ------------------ | -------- | ----------------------------------------------------- |
-| id                 | INTEGER  | PK                                                    |
-| name               | STRING   | Nombre científico                                     |
-| rank               | ENUM     | kingdom, phylum, class, order, family, genus, species |
-| parentId           | INTEGER  | FK autorreferencial                                   |
-| conservationStatus | ENUM     | LC, NT, VU, EN, CR, EW, EX, DD, NE                    |
-| createdAt          | DATETIME |                                                       |
-| updatedAt          | DATETIME |                                                       |
-| deletedAt          | DATETIME | Soft delete                                           |
+| Field            | Type    | Description                                                         |
+| ---------------- | ------- | ------------------------------------------------------------------- |
+| id               | INTEGER | Primary key                                                         |
+| name             | STRING  | Scientific name                                                     |
+| rank             | ENUM    | domain, kingdom, phylum, class, order, family, genus, species       |
+| parentId         | INTEGER | Self-referencing foreign key (nullable, allows incomplete taxonomy) |
+| description      | TEXT    | Optional description of the taxon                                   |
+| validationStatus | ENUM    | pending, validated, rejected                                        |
+| createdBy        | INTEGER  | FK → User (usuario que creó el taxón)                              |
+| createdAt        | DATETIME |                                                                    |
+| updatedAt        | DATETIME |                                                                    |
+| deletedAt        | DATETIME | Soft delete (nullable)                                             |
+
 
 # Observation
 
