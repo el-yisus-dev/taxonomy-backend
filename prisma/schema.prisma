@@ -58,9 +58,9 @@ model Taxon {
   updatedAt        DateTime  @updatedAt
   deletedAt        DateTime?
 
-  @@index([parentId])
-  @@index([rank])
-  @@index([name])
+  @@unique([name, rank])
+  @@index([parentId, rank])
+  @@index([deletedAt])
 }
 
 enum TaxonRank {

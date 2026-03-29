@@ -1,7 +1,9 @@
 import { Router, type Express } from "express"
 
 import authRouter from "./auth.routes.js";
+import taxonRouter from "./taxon.routes.js";
 import userRouter from "./user.routes.js";
+import { ApiError } from "../utils/ApiError.js";
 
 
 const routerApi = (app: Express) => {
@@ -19,9 +21,14 @@ const routerApi = (app: Express) => {
 
     app.use("/api/v1", router);
 
-    router.use("/users", userRouter);
     router.use("/auth", authRouter);
+    router.use("/taxon", taxonRouter);
+    router.use("/users", userRouter);
 
+    app.use((req, res, next) => {
+       throw new ApiError(404, `Can't find ${req.originalUrl} on this server`);
+    });
+    
 }
 
 export {

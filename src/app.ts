@@ -10,7 +10,6 @@ import { errorMiddleware } from "./middleware/error.middleware.js";
 
 import swaggerJsdoc from "./swaggerOptions.js";
 import { getCORS, RATE_LIMIT_SETTINGS, SWAGGER_OPTIONS } from "./settings.js";
-import { ApiError } from "./utils/ApiError.js";
 
 const app = express();
 
@@ -37,10 +36,6 @@ app.disable('x-powered-by');
 
 // Routes
 routerApi(app);
-
-app.use((req, res, next) => {
-   throw new ApiError(404, `Can't find ${req.originalUrl} on this server`);
-});
 
 // Middleware to handle errors
 app.use(errorMiddleware);
