@@ -41,5 +41,5 @@ routerApi(app);
 app.use(errorMiddleware);
 
 app.listen(config.PORT, () => {
-    console.log(`working on: http://localhost:${config.PORT}`);
+    console.log(`working on: http://localhost:${config.PORT}/api/v1/docs`);
 })

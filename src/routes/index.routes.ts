@@ -22,7 +22,7 @@ const routerApi = (app: Express) => {
     app.use("/api/v1", router);
 
     router.use("/auth", authRouter);
-    router.use("/taxon", taxonRouter);
+    router.use("/taxons", taxonRouter);
     router.use("/users", userRouter);
 
     app.use((req, res, next) => {

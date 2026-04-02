@@ -1,15 +1,5 @@
 import { z } from 'zod'
-
-const taxonRanks = [
-  'DOMAIN',
-  'KINGDOM',
-  'PHYLUM',
-  'CLASS',
-  'ORDER',
-  'FAMILY',
-  'GENUS',
-  'SPECIES'
-] as const
+import { hierarchy } from '../types/Taxon.js'
 
 export const createTaxonSchema = z.object({
   name: z
@@ -17,12 +7,12 @@ export const createTaxonSchema = z.object({
     .trim()
     .min(1, { error: 'The name cannot be empty' }),
 
-  rank: z.enum(taxonRanks, {
+  rank: z.enum(hierarchy, {
     error: 'The rank is required'
   }),
 
   parentId: z
-    .number({ error: 'Parent ID must be a number' })
+    .coerce.number({ error: 'Parent ID must be a number' })
     .int({ error: 'Parent ID must be an integer' })
     .positive({ error: 'Parent ID must be positive' })
     .optional(),

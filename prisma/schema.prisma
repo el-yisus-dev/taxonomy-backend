@@ -58,7 +58,7 @@ model Taxon {
   updatedAt        DateTime  @updatedAt
   deletedAt        DateTime?
 
-  @@unique([name, rank])
+  @@unique([name, parentId])
   @@index([parentId, rank])
   @@index([deletedAt])
 }

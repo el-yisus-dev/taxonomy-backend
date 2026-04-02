@@ -1,15 +1,16 @@
 import type { Request, Response } from 'express'
-import { taxonService } from '../services/taxon.service.js'
+import * as taxonService from '../services/taxon.service.js'
 
 export const createTaxon = async (req: Request, res: Response) => {
   
-  
-  console.log(res.locals.user.id);
+  const { id } = res.locals.user;
 
-  // const taxon = await taxonService.create(req.body, userId)
+  const taxon = await taxonService.createTaxon(req.body, id)
 
   res.status(201).json({
     status: 'success',
-    data: "jalando ando <taxon>"
+    data: {
+      taxon
+    }
   })
 }
