@@ -1,6 +1,5 @@
 import { prisma } from "../lib/prisma.js"
-import type { CreateTaxonDTO, TaxonRank } from "../types/Taxon.js"
-import { ApiError } from "../utils/ApiError.js"
+import type { TaxonRank } from "../types/Taxon.js"
 
 
 export const createTaxon = async (data: {

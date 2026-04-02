@@ -38,17 +38,17 @@ const router = Router();
  *             properties:
  *               rank:
  *                 type: string
- *                 example: SPECIES
+ *                 example: DOMAIN
  *               name:
  *                 type: string
  *                 minLength: 3
- *                 example: Patula
+ *                 example: Bacteria
  *               parentId:
  *                 type: number
  *                 example: 12
  *               description:
  *                 type: string
- *                 example: "Only Lives in Mexico"
+ *                 example: "Seres vivos microscópicos unicelulares o que forman agregados, sin núcleo ni orgánulos celulares, se caracterizan además por tener una pared celular de peptidoglucano."
  *
  *     responses:
  *       201:
