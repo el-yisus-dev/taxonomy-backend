@@ -15,13 +15,22 @@ import { createTaxon } from '../controllers/taxon.controller.js';
  */
 
 const router = Router();
-
 /**
  * @swagger
  * /taxons:
  *   post:
  *     summary: Create a new taxon
- *     description: Creates a new taxon in the system
+ *     description: |
+ *       Creates a new taxon in the system.
+ *       
+ *       ### Rules:
+ *       - rank must be a valid taxonomic rank.
+ *       - name will be stored in lowercase.
+ *       - parentId:
+ *         - Must NOT be provided if rank is DOMAIN.
+ *         - Optional for other ranks (can be assigned later).
+ *       - A taxon with the same name and rank cannot exist.
+ *       - Hierarchy must be valid (e.g., SPECIES cannot be parent of GENUS).
  *     tags:
  *       - Taxons
  *     security:
@@ -38,21 +47,23 @@ const router = Router();
  *             properties:
  *               rank:
  *                 type: string
+ *                 enum: [DOMAIN, KINGDOM, PHYLUM, CLASS, ORDER, FAMILY, GENUS, SPECIES]
  *                 example: DOMAIN
  *               name:
  *                 type: string
- *                 minLength: 3
+ *                 minLength: 1
  *                 example: Bacteria
  *               parentId:
- *                 type: number
+ *                 type: integer
+ *                 nullable: true
  *                 example: 12
  *               description:
  *                 type: string
- *                 example: "Seres vivos microscópicos unicelulares o que forman agregados, sin núcleo ni orgánulos celulares, se caracterizan además por tener una pared celular de peptidoglucano."
+ *                 example: "Microscopic single-celled organisms"
  *
  *     responses:
  *       201:
- *         description: User created successfully
+ *         description: Taxon created successfully
  *         content:
  *           application/json:
  *             schema:
@@ -72,19 +83,39 @@ const router = Router();
  *                           example: 1
  *                         rank:
  *                           type: string
- *                           example: Homo
+ *                           example: DOMAIN
  *                         name:
- *                           type: String
- *                           example: Sapiens
+ *                           type: string
+ *                           example: bacteria
+ *                         parentId:
+ *                           type: integer
+ *                           nullable: true
+ *                           example: null
  *                         description:
  *                           type: string
- *                           example: "Lives around the world"
+ *                           nullable: true
+ *                           example: "Microscopic single-celled organisms"
+ *                         createdBy:
+ *                           type: integer
+ *                           example: 1
  *
  *       400:
- *         description: Validation error
+ *         description: |
+ *           Validation or hierarchy error:
+ *           - Invalid hierarchy
+ *           - ParentId provided for DOMAIN
+ *
+ *       404:
+ *         description: |
+ *           Resource not found:
+ *           - Parent taxon not found
+ *           - Taxon already exists at this rank
+ *
+ *       401:
+ *         description: Unauthorized (missing or invalid token)
  *
  *       409:
- *         description: Email or username already exists
+ *         description: Duplicate taxon (unique constraint violation)
  *
  *       500:
  *         description: Internal server error

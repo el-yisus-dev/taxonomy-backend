@@ -11,7 +11,7 @@ export const createTaxon = async (
   let parent = null
 
   if (parentId && rank === hierarchy[0]) {
-      throw new ApiError(404, `ParentId isn't necesary when you have a Domain`);
+      throw new ApiError(400, `ParentId isn't necesary when you have a Domain`);
   }
 
   if (parentId !== undefined) {
@@ -39,8 +39,8 @@ export const createTaxon = async (
   
 
   if (existTaxon !== null) {
-      throw new ApiError(404, 'This taxon already exist at this rank')
-    }
+      throw new ApiError(409, 'Taxon already exists at this rank')
+  }
 
   return await taxonRepository.createTaxon({
     name: name.toLowerCase(),
