@@ -1,7 +1,7 @@
-import { log } from 'node:console';
 import * as taxonRepository from '../repositories/taxon.repository.js';
 import { hierarchy, type CreateTaxonDTO } from '../types/Taxon.js';
 import { ApiError } from '../utils/ApiError.js';
+import { getTotalPages } from '../utils/Pagination.js';
 
 export const createTaxon = async (
   data: CreateTaxonDTO,
@@ -50,3 +50,36 @@ export const createTaxon = async (
     createdBy: userId,
   })
 }
+
+export const getAllTaxons = async ({
+  page,
+  limit,
+  skip,
+  parentId,
+  includeCreator
+}: {
+  page: number
+  limit: number
+  skip: number
+  parentId: number | null | undefined
+  includeCreator?: boolean
+
+}) => {
+
+  const [taxons, total] = await Promise.all([
+    taxonRepository.findAllTaxons({ skip, limit, parentId, includeCreator }),
+    taxonRepository.countTaxons({ parentId })
+  ])
+
+  const totalPages = getTotalPages(total, limit);
+
+  return {
+    items: taxons,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages
+    }
+  }
+};

@@ -34,3 +34,60 @@ export const isExist = async (name: string, rank: TaxonRank) => {
      }
    })
 } 
+
+export const findAllTaxons = async ({
+  skip,
+  limit,
+  parentId,
+  includeCreator
+}: {
+  skip: number
+  limit: number
+  parentId: number | null | undefined
+  includeCreator?: boolean
+}) => {
+
+  return prisma.taxon.findMany({
+    where: {
+      deletedAt: null,
+      ...(parentId !== undefined && { parentId })
+    },
+    skip,
+    take: limit,
+    orderBy: {
+      createdAt: "desc"
+    },
+    select: {
+      id: true,
+      name: true,
+      rank: true,
+      parentId: true,
+      updatedAt: true,
+      description: true,
+      validationStatus: true,
+
+      ...(includeCreator && {
+        creator: {
+          select: {
+            username: true,
+            name: true,
+            lastName: true
+          }
+        }
+      })
+    }
+  })
+}
+
+export const countTaxons = async ({
+  parentId
+}: {
+  parentId: number | null | undefined
+}) => {
+  return prisma.taxon.count({
+    where: {
+      deletedAt: null,
+      ...(parentId !== undefined && { parentId })
+    }
+  })
+}
