@@ -16,5 +16,5 @@ export interface CreateTaxonDTO {
   rank: TaxonRank
   createdBy: number
   parentId?: number | null
-  description?: string
+  description?: string | null
 }

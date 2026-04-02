@@ -1,3 +1,4 @@
+import { log } from 'node:console';
 import * as taxonRepository from '../repositories/taxon.repository.js';
 import { hierarchy, type CreateTaxonDTO } from '../types/Taxon.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -7,13 +8,14 @@ export const createTaxon = async (
   userId: number
 ) => {
   const { name, rank, parentId, description } = data
-
   let parent = null
 
-  // 🌳 validar parent
-  if (parentId) {
-    parent = await taxonRepository.findById(parentId)
+  if (parentId && rank === hierarchy[0]) {
+      throw new ApiError(404, `ParentId isn't necesary when you have a Domain`);
+  }
 
+  if (parentId !== undefined) {
+    parent = await taxonRepository.findById(parentId as number)
     if (!parent) {
       throw new ApiError(404, 'Parent taxon not found')
     }
@@ -22,7 +24,7 @@ export const createTaxon = async (
     const childLevel = hierarchy.indexOf(rank)
 
     if (parentLevel === -1 || childLevel === -1) {
-      throw new ApiError(400, 'Invalid hierarchy')
+      throw new ApiError(500, 'Hierarchy configuration error')
     }
 
     if (parentLevel >= childLevel) {
@@ -31,19 +33,20 @@ export const createTaxon = async (
         `Invalid hierarchy: ${rank} cannot be child of ${parent.rank}`
       )
     }
-  } else {
-    if (rank !== 'DOMAIN') {
-      throw new ApiError(400, `${rank} must have a parent`)
-    }
-  }
+  } 
 
-  const newTaxon = await taxonRepository.createTaxon({
-    name,
+  const existTaxon = await taxonRepository.isExist(name.toLowerCase(), rank);
+  
+
+  if (existTaxon !== null) {
+      throw new ApiError(404, 'This taxon already exist at this rank')
+    }
+
+  return await taxonRepository.createTaxon({
+    name: name.toLowerCase(),
     rank,
-    parentId: parentId || null,
+    parentId: parentId ?? null,
     description: description ?? null,
     createdBy: userId,
   })
-
-  return newTaxon
 }

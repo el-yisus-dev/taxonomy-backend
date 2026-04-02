@@ -24,3 +24,13 @@ export const findById = async (id: number) => {
     }
   })
 }
+
+export const isExist = async (name: string, rank: TaxonRank) => {
+  
+  return  prisma.taxon.findFirst({
+     where: {
+       name,
+       rank,
+     }
+   })
+} 
