@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma.js"
-import type { TaxonRank } from "../types/Taxon.js"
+import type { TaxonRank, UpdateTaxonDTO } from "../types/Taxon.js"
 
 
 export const createTaxon = async (data: {
@@ -25,6 +25,15 @@ export const findById = async (id: number) => {
   })
 }
 
+export const findTaxonById = async (id: number) => {
+  return await prisma.taxon.findUnique({
+    where: { 
+      id,
+      deletedAt: null
+    }
+  })
+};
+
 export const isExist = async (name: string, rank: TaxonRank) => {
   
   return  prisma.taxon.findFirst({
@@ -33,7 +42,7 @@ export const isExist = async (name: string, rank: TaxonRank) => {
        rank,
      }
    })
-} 
+};
 
 export const findAllTaxons = async ({
   skip,
@@ -77,7 +86,7 @@ export const findAllTaxons = async ({
       })
     }
   })
-}
+};
 
 export const countTaxons = async ({
   parentId
@@ -90,4 +99,16 @@ export const countTaxons = async ({
       ...(parentId !== undefined && { parentId })
     }
   })
-}
+};
+
+export const updateTaxon = async (id: number, data: UpdateTaxonDTO) => {
+  return await prisma.taxon.update({
+    where: { id },
+    data: {
+      ...(data.name !== undefined && { name: data.name }),
+      ...(data.rank !== undefined && { rank: data.rank }),
+      ...(data.parentId !== undefined && { parentId: data.parentId }),
+      ...(data.description !== undefined && { description: data.description }),
+    },
+  });
+};

@@ -18,3 +18,16 @@ export interface CreateTaxonDTO {
   parentId?: number | null
   description?: string | null
 }
+
+export enum TaxaStatus {
+  PENDING = "PENDING",
+  VALIDATED = "VALIDATED",
+  REJECTED = "REJECTED",
+}
+
+export type UpdateTaxonDTO = {
+  name?: string;
+  rank?: TaxonRank;
+  parentId?: number | null;
+  description?: string | null;
+};

@@ -6,7 +6,7 @@ const requiredString = (field: string) =>
     .trim()
     .min(1, { error: `The ${field} cannot be empty` })
 
-const optionalString = (field: string) =>
+export const optionalString = (field: string) =>
   z
     .string({ error: `The ${field} must be a string` })
     .trim()

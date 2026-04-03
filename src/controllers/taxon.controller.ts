@@ -42,3 +42,25 @@ export const getAllTaxons = async (req: Request, res: Response) => {
       meta: result.meta
     })
 };
+
+export const updateTaxon = async (req: Request, res: Response) => {
+  const id  = Number(req.params.id);
+  const { user } = res.locals;
+
+  await taxonService.updateTaxon(id, req.body, user);
+    
+  return res.json({
+    status: "success",
+    data: {
+        message: "Taxon updated sucessfully",
+      }
+    })
+}
+
+export const getTaxonById = () => {
+  
+}
+
+export const deleteTaxon = () => {
+
+}

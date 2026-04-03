@@ -5,7 +5,10 @@ import { asyncHandler } from '../utils/AsyncHandler.js';
 import { validate } from '../middleware/validate.middleware.js';
 
 import { createTaxonSchema } from '../schemas/taxon.schema.js';
-import { createTaxon, getAllTaxons } from '../controllers/taxon.controller.js';
+import { createTaxon, deleteTaxon, getAllTaxons, getTaxonById, updateTaxon } from '../controllers/taxon.controller.js';
+import { verifyRole } from '../middleware/acl.middleware.js';
+import { Role } from '../types/User.js';
+import { idParamSchema } from '../schemas/id.schema.js';
 
 /**
  * @swagger
@@ -121,7 +124,7 @@ const router = Router();
  *       500:
  *         description: Internal server error
  */
-router.post('/', asyncHandler(verifyToken), validate(createTaxonSchema), asyncHandler(createTaxon))
+router.post('/', asyncHandler(verifyToken), validate(createTaxonSchema), asyncHandler(createTaxon));
 
 /**
  * @swagger
@@ -271,6 +274,79 @@ router.post('/', asyncHandler(verifyToken), validate(createTaxonSchema), asyncHa
  *       500:
  *         description: Internal server error
  */
-router.get('/', asyncHandler(verifyToken), asyncHandler(getAllTaxons))
+router.get('/', asyncHandler(verifyToken), asyncHandler(getAllTaxons));
+
+
+router.get('/:id', asyncHandler(verifyToken), asyncHandler(getTaxonById));
+
+ /**
+ * @swagger
+ * /taxons/{id}:
+ *   put:
+ *     summary: Update a taxon
+ *     description: |
+ *       Updates an existing taxon.
+ *
+ *       ### Business rules:
+ *       - Only the owner can update the taxon if the role is USER
+ *       - USER can only update taxons with status PENDING
+ *       - MODERATOR and ADMIN can update any taxon
+ *       - Hierarchy validation is enforced when updating rank or parentId
+ *
+ *       ### Notes:
+ *       - Partial updates are allowed (only send fields you want to update)
+ *       - Hierarchy rules must be respected:
+ *         - parent must be a higher rank than the child
+ *
+ *     tags:
+ *       - Taxons
+ *     security:
+ *       - bearerAuth: []
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Taxon ID
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateTaxon'
+ *
+ *     responses:
+ *       200:
+ *         description: Taxon updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   $ref: '#/components/schemas/Taxon'
+ *
+ *       404:
+ *         description: Taxon not found
+ *
+ *       400:
+ *         description: Validation error
+ *
+ *       403:
+ *         description: You do not have sufficient permissions to perform this action
+ *
+ *       409:
+ *         description: You are not the owner to do this action
+ */
+router.put('/:id', asyncHandler(verifyToken), validate(idParamSchema, "params"), asyncHandler(updateTaxon));
+
+router.delete('/:id', asyncHandler(verifyToken), asyncHandler(deleteTaxon));
 
 export default router
