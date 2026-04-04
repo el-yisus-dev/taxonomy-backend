@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { hierarchy } from '../types/Taxon.js'
+import { hierarchy, TaxaStatus } from '../types/Taxon.js'
 import { optionalString } from './user.schema.js'
 
 export const createTaxonSchema = z.object({
@@ -41,3 +41,9 @@ export const updateTaxonSchema = z
       message: "At least one field must be provided to update the taxon.",
     }
   );
+
+export const updateTaxonStatusSchema = z.object({
+  status: z.enum(TaxaStatus, {
+    error: "The correct status is necessary",
+  }),
+});

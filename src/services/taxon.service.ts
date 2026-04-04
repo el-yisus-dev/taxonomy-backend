@@ -169,3 +169,25 @@ export const deleteTaxa = async (id: number, user: any) => {
   
   return taxonRepository.softDeleteTaxa(id);
 }
+
+export const updateTaxaStatus = async (id: number, data: { status: TaxaStatus }) => {
+  
+  const taxa = await taxonRepository.findById(id);
+
+  if (!taxa) {
+    throw new ApiError(404, "Taxa not found.");
+  }
+
+  if (taxa.validationStatus === TaxaStatus.VALIDATED) {
+    throw new ApiError(409, "The status are already validated");
+  }
+
+  const updateTaxonStatus = await taxonRepository.updateTaxonStatus(id, data);
+
+  return updateTaxonStatus;
+
+}
+ 
+export const updateTaxaParent = async (id: number, data: { parentId: number}) => {
+  
+}

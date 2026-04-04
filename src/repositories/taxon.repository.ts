@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma.js"
-import type { TaxonRank, UpdateTaxonDTO } from "../types/Taxon.js"
+import { TaxaStatus, type TaxonRank, type UpdateTaxonDTO } from "../types/Taxon.js"
 
 
 export const createTaxon = async (data: {
@@ -143,3 +143,15 @@ export const hasChildren = async (id: number): Promise<boolean> => {
 
   return child !== null;
 };
+
+export const updateTaxonStatus = async (id: number, data: { status: TaxaStatus}) => {
+  return await prisma.taxon.update({
+    where: {
+      id,
+      deletedAt: null
+    },
+    data: {
+      validationStatus: data.status
+    }
+  }) 
+}

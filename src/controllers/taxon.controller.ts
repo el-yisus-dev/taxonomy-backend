@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 
 import * as taxonService from '../services/taxon.service.js';
 import { getPagination } from '../utils/Pagination.js';
+import { id } from 'zod/locales';
 
 export const createTaxon = async (req: Request, res: Response) => {
   
@@ -55,7 +56,7 @@ export const updateTaxon = async (req: Request, res: Response) => {
         message: "Taxon updated sucessfully",
       }
     })
-}
+};
 
 export const getTaxonById = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
@@ -66,7 +67,7 @@ export const getTaxonById = async (req: Request, res: Response) => {
     status: "success",
     data: taxa
   })
-}
+};
 
 export const deleteTaxon =  async (req: Request, res: Response) => {
     const id = Number(req.params.id)
@@ -81,12 +82,30 @@ export const deleteTaxon =  async (req: Request, res: Response) => {
         message: "Taxa deleted successfully"
       }
     })
-}
+};
 
-export const updateTaxaStatus = async () => {
-  
-}
+export const updateTaxaStatus = async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
 
-export const updateTaxaParent = async () => {
+   await taxonService.updateTaxaStatus(id, req.body);
 
+   return res.json({
+    status: "success",
+    data: {
+        message: "Taxon updated sucessfully",
+      }
+   });
+};
+
+export const updateTaxaParent = async (req: Request, res: Response) => {
+   const id = Number(req.params.id);
+
+   await taxonService.updateTaxaParent(id, req.body);
+
+   return res.json({
+    status: "success",
+    data: {
+        message: "Taxon updated sucessfully",
+      }
+   });
 }

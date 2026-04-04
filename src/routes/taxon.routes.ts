@@ -474,9 +474,16 @@ router.delete('/:id', asyncHandler(verifyToken), validate(idParamSchema, "params
  *     description: |
  *       Updates the validation status of a taxon.
  *
- *       ### Notes:
+ *       ### Business rules:
  *       - Only ADMIN and MODERATOR can perform this action
- *       - This endpoint is currently in a preliminary (dummy) version
+ *       - A taxon in PENDING status can be updated to:
+ *         - VALIDATED
+ *         - REJECTED
+ *       - Once a taxon is VALIDATED or REJECTED, its status cannot be modified
+ *
+ *       ### Notes:
+ *       - Requires authentication
+ *       - Uses strict validation for status values
  *
  *     tags:
  *       - Taxons
@@ -498,11 +505,13 @@ router.delete('/:id', asyncHandler(verifyToken), validate(idParamSchema, "params
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - status
  *             properties:
  *               status:
  *                 type: string
- *                 enum: [PENDING, APPROVED, REJECTED]
- *                 example: APPROVED
+ *                 enum: [PENDING, VALIDATED, REJECTED]
+ *                 example: VALIDATED
  *
  *     responses:
  *       200:
@@ -520,16 +529,25 @@ router.delete('/:id', asyncHandler(verifyToken), validate(idParamSchema, "params
  *                   properties:
  *                     message:
  *                       type: string
- *                       example: Taxon status updated successfully
+ *                       example: Taxon updated successfully
+ *
+ *       400:
+ *         description: Invalid status value
  *
  *       401:
- *         description: Unauthorized
+ *         description: Unauthorized (missing or invalid token)
  *
  *       403:
  *         description: Forbidden (only ADMIN or MODERATOR allowed)
  *
  *       404:
  *         description: Taxon not found
+ *
+ *       409:
+ *         description: |
+ *           Conflict:
+ *           - This taxon has already been validated
+ *           - This taxon status can no longer be modified
  */
 router.patch('/:id/status', asyncHandler(verifyToken), verifyRole([Role.ADMIN, Role.MODERATOR]), validate(idParamSchema, "params"), asyncHandler(updateTaxaStatus));
 
