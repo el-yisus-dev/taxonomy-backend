@@ -74,25 +74,26 @@ export const updateTaxon = async (
   userLocals: any
 ) => {
   const { role, id: userId } = userLocals;
+  const { rank, name, description } = data;
   
   const taxa = await taxonRepository.findTaxonById(id);
-
+  
   if (!taxa) {
     throw new ApiError(404, `Taxa not found.`);
   }
 
   const isOwner = taxa.createdBy === userId;
-  const isPrivileged = role === Role.MODERATOR || role === Role.ADMIN;
+  
 
-  // 🔒 USER rules
   if (role === Role.USER) {
+    
     if (!isOwner) {
       throw new ApiError(
         403,
         `You are not the owner to do this action.`
       );
     }
-
+    
     if (taxa.validationStatus !== TaxaStatus.PENDING) {
       throw new ApiError(
         403,
@@ -100,15 +101,71 @@ export const updateTaxon = async (
       );
     }
   }
+    
+  const newtaxaName = data.name ? data.name.toLowerCase() : taxa.name;
+  const newtaxaRank = data.rank ? data.rank : taxa.rank;
 
-  if (data.rank || data.parentId !== undefined) {
-    const newRank = data.rank ?? taxa.rank;
-    const newParentId = data.parentId ?? taxa.parentId;
-
-    await validateHierarchy(newRank, newParentId);
+    
+  const existTaxon = await taxonRepository.isExist(newtaxaName, newtaxaRank);
+  
+  if (existTaxon !== null) {
+      throw new ApiError(409, 'That Taxon name already exists at this rank')
   }
 
-  const updatedTaxon = await taxonRepository.updateTaxon(id, data);
+ const updatedTaxon = await taxonRepository.updateTaxon(id, {
+    ...(name !== undefined && { name: name?.toLowerCase() }),  
+    ...(rank !== undefined && { rank }),  
+    ...(description !== undefined && { description }),  
+  });
 
   return updatedTaxon;
 };
+
+export const getTaxonById = async (id: number) => {
+  const taxa = await taxonRepository.findById(id);
+
+  if (!taxa) {
+    throw new ApiError(404, "Taxa not found.");
+  }
+
+  return taxa;
+
+}
+
+export const deleteTaxa = async (id: number, user: any) => {
+  
+  const { userId, role } = user;
+
+  const existinTaxa = await taxonRepository.findTaxonById(id);
+
+  if (!existinTaxa) {
+    throw new ApiError(404, "Taxa not found");
+  }
+
+  const isOwner = existinTaxa.createdBy === userId;
+
+  if (role === Role.USER) {
+    if (!isOwner) {
+      throw new ApiError(403, `You are not the owner to do this action.`);
+    }
+
+    if (existinTaxa.validationStatus !== TaxaStatus.PENDING) {
+      throw new ApiError(
+        403,
+        `You can only delete taxa in PENDING status.`
+      );
+    }
+  }
+        
+  
+  const hasChildren = await taxonRepository.hasChildren(id);
+
+  if (hasChildren) {
+    throw new ApiError(
+      400,
+      "Cannot delete a taxon that has children."
+    );
+  }
+  
+  return taxonRepository.softDeleteTaxa(id);
+}

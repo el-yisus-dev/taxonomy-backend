@@ -40,6 +40,7 @@ export const isExist = async (name: string, rank: TaxonRank) => {
      where: {
        name,
        rank,
+       deletedAt: null
      }
    })
 };
@@ -102,13 +103,43 @@ export const countTaxons = async ({
 };
 
 export const updateTaxon = async (id: number, data: UpdateTaxonDTO) => {
+
   return await prisma.taxon.update({
-    where: { id },
+    where: { 
+      id,
+      deletedAt: null
+     },
+    // @ts-ignore
     data: {
       ...(data.name !== undefined && { name: data.name }),
       ...(data.rank !== undefined && { rank: data.rank }),
-      ...(data.parentId !== undefined && { parentId: data.parentId }),
       ...(data.description !== undefined && { description: data.description }),
     },
   });
+};
+
+export const softDeleteTaxa = async(id: number) => {
+  return prisma.taxon.update({
+    where: { 
+      id,
+      deletedAt: null 
+    },
+    data: {
+      deletedAt: new Date(),
+    }
+  })
+}
+
+export const hasChildren = async (id: number): Promise<boolean> => {
+  const child = await prisma.taxon.findFirst({
+    where: {
+      parentId: id,
+      deletedAt: null
+    },
+    select: {
+      id: true
+    }
+  });
+
+  return child !== null;
 };

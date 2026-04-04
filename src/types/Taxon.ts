@@ -26,8 +26,7 @@ export enum TaxaStatus {
 }
 
 export type UpdateTaxonDTO = {
-  name?: string;
-  rank?: TaxonRank;
-  parentId?: number | null;
-  description?: string | null;
+  name?: string | null | undefined;
+  rank?: TaxonRank | null | undefined;
+  description?: string | null | undefined;
 };

@@ -25,17 +25,19 @@ export const createTaxonSchema = z.object({
     .optional()
 })
 
-export const updateTaxonSchema = z.object({
-  name: optionalString("name"),
-  parentId: z
-    .coerce.number({ error: 'Parent ID must be a number' })
-    .int({ error: 'Parent ID must be an integer' })
-    .positive({ error: 'Parent ID must be positive' })
-    .optional(),
-  description: optionalString("description"),
-  rank:  z
-    .enum(hierarchy, {
-      error: 'The rank is required'
-    })
-    .optional(),
-});
+export const updateTaxonSchema = z
+  .object({
+    name: optionalString("name"),
+    description: optionalString("description"),
+    rank: z
+      .enum(hierarchy, {
+        error: 'The correct rank is necesary'
+      })
+      .optional(),
+  })
+  .refine(
+    (data) => Object.values(data).some(value => value !== undefined),
+    {
+      message: "At least one field must be provided to update the taxon.",
+    }
+  );

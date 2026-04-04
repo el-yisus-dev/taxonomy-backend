@@ -4,8 +4,8 @@ import { verifyToken } from '../middleware/auth.middleware.js';
 import { asyncHandler } from '../utils/AsyncHandler.js';
 import { validate } from '../middleware/validate.middleware.js';
 
-import { createTaxonSchema } from '../schemas/taxon.schema.js';
-import { createTaxon, deleteTaxon, getAllTaxons, getTaxonById, updateTaxon } from '../controllers/taxon.controller.js';
+import { createTaxonSchema, updateTaxonSchema } from '../schemas/taxon.schema.js';
+import { createTaxon, deleteTaxon, getAllTaxons, getTaxonById, updateTaxaParent, updateTaxaStatus, updateTaxon } from '../controllers/taxon.controller.js';
 import { verifyRole } from '../middleware/acl.middleware.js';
 import { Role } from '../types/User.js';
 import { idParamSchema } from '../schemas/id.schema.js';
@@ -276,27 +276,74 @@ router.post('/', asyncHandler(verifyToken), validate(createTaxonSchema), asyncHa
  */
 router.get('/', asyncHandler(verifyToken), asyncHandler(getAllTaxons));
 
+/**
+ * @swagger
+ * /taxons/{id}:
+ *   get:
+ *     summary: Get a taxon by ID
+ *     description: |
+ *       Retrieves a single taxon by its ID.
+ *
+ *       ### Notes:
+ *       - Requires authentication
+ *       - Returns the taxon data if found
+ *
+ *     tags:
+ *       - Taxons
+ *     security:
+ *       - bearerAuth: []
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Taxon ID
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *
+ *     responses:
+ *       200:
+ *         description: Taxon retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   $ref: '#/components/schemas/Taxon'
+ *
+ *       404:
+ *         description: Taxon not found
+ *
+ *       401:
+ *         description: Unauthorized (missing or invalid token)
+ */
+router.get('/:id', asyncHandler(verifyToken), validate(idParamSchema, "params"), asyncHandler(getTaxonById));
 
-router.get('/:id', asyncHandler(verifyToken), asyncHandler(getTaxonById));
-
- /**
+/**
  * @swagger
  * /taxons/{id}:
  *   put:
- *     summary: Update a taxon
+ *     summary: Update basic taxon information
  *     description: |
- *       Updates an existing taxon.
+ *       Updates basic fields of an existing taxon.
  *
  *       ### Business rules:
  *       - Only the owner can update the taxon if the role is USER
  *       - USER can only update taxons with status PENDING
  *       - MODERATOR and ADMIN can update any taxon
- *       - Hierarchy validation is enforced when updating rank or parentId
  *
  *       ### Notes:
  *       - Partial updates are allowed (only send fields you want to update)
- *       - Hierarchy rules must be respected:
- *         - parent must be a higher rank than the child
+ *       - This endpoint ONLY updates:
+ *         - name
+ *         - description
+ *         - rank
+ *       - parentId and validationStatus are handled in separate endpoints
  *
  *     tags:
  *       - Taxons
@@ -331,7 +378,11 @@ router.get('/:id', asyncHandler(verifyToken), asyncHandler(getTaxonById));
  *                   type: string
  *                   example: success
  *                 data:
- *                   $ref: '#/components/schemas/Taxon'
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: Taxon updated successfully
  *
  *       404:
  *         description: Taxon not found
@@ -343,10 +394,216 @@ router.get('/:id', asyncHandler(verifyToken), asyncHandler(getTaxonById));
  *         description: You do not have sufficient permissions to perform this action
  *
  *       409:
- *         description: You are not the owner to do this action
+ *         description: That taxon name already exists at this rank
  */
-router.put('/:id', asyncHandler(verifyToken), validate(idParamSchema, "params"), asyncHandler(updateTaxon));
+router.put('/:id', asyncHandler(verifyToken), validate(idParamSchema, "params"), validate(updateTaxonSchema), asyncHandler(updateTaxon));
 
-router.delete('/:id', asyncHandler(verifyToken), asyncHandler(deleteTaxon));
+/**
+ * @swagger
+ * /taxons/{id}:
+ *   delete:
+ *     summary: Soft delete a taxon
+ *     description: |
+ *       Performs a soft delete on a taxon by setting its deletedAt field.
+ *
+ *       ### Business rules:
+ *       - USER can only delete their own taxons
+ *       - USER can only delete taxons in PENDING status
+ *       - ADMIN and MODERATOR can delete any taxon
+ *       - A taxon cannot be deleted if it has children
+ *
+ *       ### Notes:
+ *       - This does NOT permanently remove the taxon from the database
+ *       - The taxon will be excluded from future queries
+ *       - Requires authentication
+ *
+ *     tags:
+ *       - Taxons
+ *     security:
+ *       - bearerAuth: []
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Taxon ID
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *
+ *     responses:
+ *       200:
+ *         description: Taxon soft deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: Taxon deleted successfully
+ *
+ *       400:
+ *         description: Cannot delete a taxon that has children
+ *
+ *       403:
+ *         description: |
+ *           Forbidden:
+ *           - You are not the owner of this taxon
+ *           - You can only delete taxons in PENDING status
+ *
+ *       404:
+ *         description: Taxon not found
+ *
+ *       401:
+ *         description: Unauthorized (missing or invalid token)
+ */
+router.delete('/:id', asyncHandler(verifyToken), validate(idParamSchema, "params"), asyncHandler(deleteTaxon));
+
+/**
+ * @swagger
+ * /taxons/{id}/status:
+ *   patch:
+ *     summary: Update taxon validation status
+ *     description: |
+ *       Updates the validation status of a taxon.
+ *
+ *       ### Notes:
+ *       - Only ADMIN and MODERATOR can perform this action
+ *       - This endpoint is currently in a preliminary (dummy) version
+ *
+ *     tags:
+ *       - Taxons
+ *     security:
+ *       - bearerAuth: []
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Taxon ID
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [PENDING, APPROVED, REJECTED]
+ *                 example: APPROVED
+ *
+ *     responses:
+ *       200:
+ *         description: Taxon status updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: Taxon status updated successfully
+ *
+ *       401:
+ *         description: Unauthorized
+ *
+ *       403:
+ *         description: Forbidden (only ADMIN or MODERATOR allowed)
+ *
+ *       404:
+ *         description: Taxon not found
+ */
+router.patch('/:id/status', asyncHandler(verifyToken), verifyRole([Role.ADMIN, Role.MODERATOR]), validate(idParamSchema, "params"), asyncHandler(updateTaxaStatus));
+
+/**
+ * @swagger
+ * /taxons/{id}/parent:
+ *   patch:
+ *     summary: Update taxon parent
+ *     description: |
+ *       Updates the parent of a taxon (hierarchy change).
+ *
+ *       ### Notes:
+ *       - Only ADMIN and MODERATOR can perform this action
+ *       - This endpoint is currently in a preliminary (dummy) version
+ *       - Future versions will include hierarchy validation (no cycles, valid rank relationships)
+ *
+ *     tags:
+ *       - Taxons
+ *     security:
+ *       - bearerAuth: []
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Taxon ID
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               parentId:
+ *                 type: integer
+ *                 nullable: true
+ *                 example: 2
+ *                 description: New parent taxon ID (null for root)
+ *
+ *     responses:
+ *       200:
+ *         description: Taxon parent updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: Taxon parent updated successfully
+ *
+ *       400:
+ *         description: Invalid parent assignment (future validation)
+ *
+ *       401:
+ *         description: Unauthorized
+ *
+ *       403:
+ *         description: Forbidden (only ADMIN or MODERATOR allowed)
+ *
+ *       404:
+ *         description: Taxon not found
+ */
+router.patch('/:id/parent', asyncHandler(verifyToken), verifyRole([Role.ADMIN, Role.MODERATOR]), validate(idParamSchema, "params"), asyncHandler(updateTaxaParent));
+
 
 export default router

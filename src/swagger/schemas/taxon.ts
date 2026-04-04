@@ -95,6 +95,7 @@ export const TAXON = {
       name: {
         type: "string",
         description: "Updated scientific name",
+        nullable: true,
         example: "Plantae"
       },
       description: {

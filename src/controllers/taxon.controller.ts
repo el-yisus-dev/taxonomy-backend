@@ -57,10 +57,36 @@ export const updateTaxon = async (req: Request, res: Response) => {
     })
 }
 
-export const getTaxonById = () => {
+export const getTaxonById = async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  
+  const taxa = await taxonService.getTaxonById(id);
+
+  res.json({
+    status: "success",
+    data: taxa
+  })
+}
+
+export const deleteTaxon =  async (req: Request, res: Response) => {
+    const id = Number(req.params.id)
+    
+    const { user } = res.locals;
+
+    await taxonService.deleteTaxa(id, user)
+  
+    res.status(200).json({
+      status: "success",
+      data: {
+        message: "Taxa deleted successfully"
+      }
+    })
+}
+
+export const updateTaxaStatus = async () => {
   
 }
 
-export const deleteTaxon = () => {
+export const updateTaxaParent = async () => {
 
 }
