@@ -144,14 +144,18 @@ export const hasChildren = async (id: number): Promise<boolean> => {
   return child !== null;
 };
 
-export const updateTaxonStatus = async (id: number, data: { status: TaxaStatus}) => {
+export const updateTaxonKeyInfo = async (
+  id: number,
+  data: { status?: TaxaStatus; parentId?: number }
+) => {
   return await prisma.taxon.update({
     where: {
       id,
       deletedAt: null
     },
     data: {
-      validationStatus: data.status
+      ...(data.status !== undefined && { validationStatus: data.status }),
+      ...(data.parentId !== undefined && { parentId: data.parentId })
     }
-  }) 
-}
+  });
+};

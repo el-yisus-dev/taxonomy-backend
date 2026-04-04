@@ -10,8 +10,7 @@ export const createTaxon = async (
   userId: number
 ) => {
   const { name, rank, parentId, description } = data
-  let parent = null
-
+  
   if (parentId && rank === hierarchy[0]) {
       throw new ApiError(400, `ParentId isn't necesary when you have a Domain`);
   }
@@ -170,24 +169,47 @@ export const deleteTaxa = async (id: number, user: any) => {
   return taxonRepository.softDeleteTaxa(id);
 }
 
-export const updateTaxaStatus = async (id: number, data: { status: TaxaStatus }) => {
-  
+export const updateTaxaStatus = async (
+  id: number,
+  data: { status: TaxaStatus }
+) => {
   const taxa = await taxonRepository.findById(id);
 
   if (!taxa) {
     throw new ApiError(404, "Taxa not found.");
   }
 
-  if (taxa.validationStatus === TaxaStatus.VALIDATED) {
-    throw new ApiError(409, "The status are already validated");
+  if (taxa.validationStatus !== TaxaStatus.PENDING) {
+    throw new ApiError(
+      409,
+      "Only PENDING taxa can be updated"
+    );
   }
 
-  const updateTaxonStatus = await taxonRepository.updateTaxonStatus(id, data);
+  const { status } = data;
 
-  return updateTaxonStatus;
+  return await taxonRepository.updateTaxonKeyInfo(id, { status });
+};
 
-}
- 
-export const updateTaxaParent = async (id: number, data: { parentId: number}) => {
+export const updateTaxaParent = async (id: number, data: { parentId: number }) => {
   
-}
+  const { parentId } = data;
+  const taxa = await taxonRepository.findById(id);
+  
+  if (!taxa) {
+    throw new ApiError(404, "Taxa not found.");
+  }
+
+  if (taxa.validationStatus !== TaxaStatus.PENDING) {
+    throw new ApiError(409, "Cannot modify a non-pending taxon");
+  }
+
+  
+  if (parentId === taxa.id) {
+    throw new ApiError(400, "A taxon cannot be its own parent");
+  }
+  
+  await validateHierarchy(taxa.rank, parentId);
+
+  return await taxonRepository.updateTaxonKeyInfo(id, { parentId });
+};

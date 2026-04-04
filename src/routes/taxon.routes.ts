@@ -4,7 +4,7 @@ import { verifyToken } from '../middleware/auth.middleware.js';
 import { asyncHandler } from '../utils/AsyncHandler.js';
 import { validate } from '../middleware/validate.middleware.js';
 
-import { createTaxonSchema, updateTaxonSchema } from '../schemas/taxon.schema.js';
+import { createTaxonSchema, updateTaxonParentSchema, updateTaxonSchema, updateTaxonStatusSchema } from '../schemas/taxon.schema.js';
 import { createTaxon, deleteTaxon, getAllTaxons, getTaxonById, updateTaxaParent, updateTaxaStatus, updateTaxon } from '../controllers/taxon.controller.js';
 import { verifyRole } from '../middleware/acl.middleware.js';
 import { Role } from '../types/User.js';
@@ -476,14 +476,16 @@ router.delete('/:id', asyncHandler(verifyToken), validate(idParamSchema, "params
  *
  *       ### Business rules:
  *       - Only ADMIN and MODERATOR can perform this action
- *       - A taxon in PENDING status can be updated to:
- *         - VALIDATED
- *         - REJECTED
- *       - Once a taxon is VALIDATED or REJECTED, its status cannot be modified
+ *       - Only taxons in PENDING status can be updated
+ *       - Allowed transitions:
+ *         - PENDING → VALIDATED
+ *         - PENDING → REJECTED
+ *       - Once a taxon is VALIDATED or REJECTED, it cannot be modified again
  *
  *       ### Notes:
+ *       - The `PENDING` status cannot be set via this endpoint
  *       - Requires authentication
- *       - Uses strict validation for status values
+ *       - Strict validation is enforced for status values
  *
  *     tags:
  *       - Taxons
@@ -510,8 +512,9 @@ router.delete('/:id', asyncHandler(verifyToken), validate(idParamSchema, "params
  *             properties:
  *               status:
  *                 type: string
- *                 enum: [PENDING, VALIDATED, REJECTED]
+ *                 enum: [VALIDATED, REJECTED]
  *                 example: VALIDATED
+ *                 description: New validation status
  *
  *     responses:
  *       200:
@@ -529,7 +532,7 @@ router.delete('/:id', asyncHandler(verifyToken), validate(idParamSchema, "params
  *                   properties:
  *                     message:
  *                       type: string
- *                       example: Taxon updated successfully
+ *                       example: Taxon status updated successfully
  *
  *       400:
  *         description: Invalid status value
@@ -546,10 +549,9 @@ router.delete('/:id', asyncHandler(verifyToken), validate(idParamSchema, "params
  *       409:
  *         description: |
  *           Conflict:
- *           - This taxon has already been validated
- *           - This taxon status can no longer be modified
+ *           - Only PENDING taxa can be updated
  */
-router.patch('/:id/status', asyncHandler(verifyToken), verifyRole([Role.ADMIN, Role.MODERATOR]), validate(idParamSchema, "params"), asyncHandler(updateTaxaStatus));
+router.patch('/:id/status', asyncHandler(verifyToken), verifyRole([Role.ADMIN, Role.MODERATOR]), validate(idParamSchema, "params"), validate(updateTaxonStatusSchema), asyncHandler(updateTaxaStatus));
 
 /**
  * @swagger
@@ -559,10 +561,16 @@ router.patch('/:id/status', asyncHandler(verifyToken), verifyRole([Role.ADMIN, R
  *     description: |
  *       Updates the parent of a taxon (hierarchy change).
  *
- *       ### Notes:
+ *       ### Business rules:
  *       - Only ADMIN and MODERATOR can perform this action
- *       - This endpoint is currently in a preliminary (dummy) version
- *       - Future versions will include hierarchy validation (no cycles, valid rank relationships)
+ *       - Only taxons in PENDING status can be modified
+ *       - A taxon cannot be its own parent
+ *       - Parent must exist
+ *       - Parent must be a higher rank than the child
+ *
+ *       ### Notes:
+ *       - This endpoint enforces hierarchy validation
+ *       - Cyclic relationships are not yet prevented (future improvement)
  *
  *     tags:
  *       - Taxons
@@ -584,12 +592,13 @@ router.patch('/:id/status', asyncHandler(verifyToken), verifyRole([Role.ADMIN, R
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - parentId
  *             properties:
  *               parentId:
  *                 type: integer
- *                 nullable: true
  *                 example: 2
- *                 description: New parent taxon ID (null for root)
+ *                 description: New parent taxon ID
  *
  *     responses:
  *       200:
@@ -607,10 +616,13 @@ router.patch('/:id/status', asyncHandler(verifyToken), verifyRole([Role.ADMIN, R
  *                   properties:
  *                     message:
  *                       type: string
- *                       example: Taxon parent updated successfully
+ *                       example: Taxon updated successfully
  *
  *       400:
- *         description: Invalid parent assignment (future validation)
+ *         description: |
+ *           Invalid request:
+ *           - A taxon cannot be its own parent
+ *           - Invalid hierarchy (parent must be higher rank)
  *
  *       401:
  *         description: Unauthorized
@@ -619,9 +631,12 @@ router.patch('/:id/status', asyncHandler(verifyToken), verifyRole([Role.ADMIN, R
  *         description: Forbidden (only ADMIN or MODERATOR allowed)
  *
  *       404:
- *         description: Taxon not found
+ *         description: Taxon or parent not found
+ *
+ *       409:
+ *         description: Cannot modify a non-pending taxon
  */
-router.patch('/:id/parent', asyncHandler(verifyToken), verifyRole([Role.ADMIN, Role.MODERATOR]), validate(idParamSchema, "params"), asyncHandler(updateTaxaParent));
+router.patch('/:id/parent', asyncHandler(verifyToken), verifyRole([Role.ADMIN, Role.MODERATOR]), validate(idParamSchema, "params"), validate(updateTaxonParentSchema), asyncHandler(updateTaxaParent));
 
 
 export default router

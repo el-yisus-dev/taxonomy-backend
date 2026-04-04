@@ -43,7 +43,14 @@ export const updateTaxonSchema = z
   );
 
 export const updateTaxonStatusSchema = z.object({
-  status: z.enum(TaxaStatus, {
+  status: z.enum([TaxaStatus.REJECTED, TaxaStatus.VALIDATED], {
     error: "The correct status is necessary",
   }),
+});
+
+export const updateTaxonParentSchema = z.object({
+    parentId: z
+    .coerce.number({ error: 'Parent ID must be a number' })
+    .int({ error: 'Parent ID must be an integer' })
+    .positive({ error: 'Parent ID must be positive' })
 });
