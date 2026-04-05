@@ -109,12 +109,6 @@ export const TAXON = {
         description: "Updated taxonomic rank",
         enum: ["DOMAIN", "KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"],
         example: "KINGDOM"
-      },
-      parentId: {
-        type: "integer",
-        nullable: true,
-        description: "Updated parent taxon ID",
-        example: 2
       }
     }
   }

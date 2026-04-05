@@ -101,7 +101,6 @@ export const updateTaxon = async (
 
   const isOwner = taxa.createdBy === userId;
   
-
   if (role === Role.USER) {
     
     if (!isOwner) {
