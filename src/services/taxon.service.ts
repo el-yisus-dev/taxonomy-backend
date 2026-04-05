@@ -93,7 +93,7 @@ export const updateTaxon = async (
   const { role, id: userId } = userLocals;
   const { rank, name, description } = data;
   
-  const taxa = await taxonRepository.findTaxonById(id);
+  const taxa = await taxonRepository.findById(id);
   
   if (!taxa) {
     throw new ApiError(404, `Taxa not found.`);
@@ -153,7 +153,7 @@ export const deleteTaxa = async (id: number, user: any) => {
   
   const { userId, role } = user;
 
-  const existinTaxa = await taxonRepository.findTaxonById(id);
+  const existinTaxa = await taxonRepository.findById(id);
 
   if (!existinTaxa) {
     throw new ApiError(404, "Taxa not found");

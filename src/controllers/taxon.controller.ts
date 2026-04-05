@@ -62,7 +62,7 @@ export const updateTaxon = async (req: Request, res: Response) => {
 
 export const getTaxonById = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
-  
+
   const taxa = await taxonService.getTaxonById(id);
 
   res.json({

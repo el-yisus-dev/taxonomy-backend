@@ -21,6 +21,24 @@ export const findById = async (id: number) => {
     where: {
       id,
       deletedAt: null
+    },
+    select: {
+      id: true,
+      rank: true,
+      name: true,
+      description: true,
+      validationStatus: true,
+      parentId: true,
+      createdBy: true,
+      createdAt: true,
+      updatedAt: true,
+      creator: {
+          select: {
+            username: true,
+            name: true,
+            lastName: true
+          }
+        }
     }
   })
 }
@@ -28,8 +46,7 @@ export const findById = async (id: number) => {
 export const findTaxonById = async (id: number) => {
   return await prisma.taxon.findUnique({
     where: { 
-      id,
-      deletedAt: null
+      id
     }
   })
 };
@@ -116,7 +133,7 @@ export const countTaxons = async ({
     where: {
       deletedAt: null,
 
-      ...(parentId !== undefined && { parentId }),
+      ...(parentId && { parentId }),
 
       ...(rank && { rank: { in: rank } }),
 
