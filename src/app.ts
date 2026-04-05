@@ -16,8 +16,9 @@ const app = express();
 // Middleware to response in json format 
 app.use(express.json());
 
-if (config. NODE_ENV !== 'development') {
-  app.use(rateLimit(RATE_LIMIT_SETTINGS))
+if (config.NODE_ENV !== 'development') {
+    // Middleware to delimit the number of requests
+    app.use(rateLimit(RATE_LIMIT_SETTINGS))
 }
 
 // Config Cors
@@ -40,5 +41,5 @@ routerApi(app);
 app.use(errorMiddleware);
 
 app.listen(config.PORT, () => {
-    console.log(`working on: http://localhost:${config.PORT}`);
+    console.log(`working on: http://localhost:${config.PORT}/api/v1/docs`);
 })

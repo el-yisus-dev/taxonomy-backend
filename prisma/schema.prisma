@@ -1,5 +1,7 @@
 generator client {
-    provider = "prisma-client-js"    
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+  
 }
 
 datasource db {
@@ -23,10 +25,11 @@ model User {
   avatarUrl String?
 
   isActive  Boolean  @default(true)
-
   emailVerified Boolean @default(false)
 
   lastLoginAt DateTime?
+
+  taxa      Taxon[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -34,6 +37,49 @@ model User {
 
   @@index([email])
   @@index([username])
+}
+
+model Taxon {
+  id               Int       @id @default(autoincrement())
+
+  name             String
+  rank             TaxonRank
+
+  parentId         Int?
+  parent           Taxon?    @relation("TaxonHierarchy", fields: [parentId], references: [id])
+  children         Taxon[]   @relation("TaxonHierarchy")
+
+  description      String?
+
+  validationStatus ValidationStatus @default(PENDING)
+
+  createdBy        Int
+  creator          User      @relation(fields: [createdBy], references: [id])
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  @@unique([name, parentId])
+  @@index([parentId, rank])
+  @@index([deletedAt])
+}
+
+enum TaxonRank {
+  DOMAIN
+  KINGDOM
+  PHYLUM
+  CLASS
+  ORDER
+  FAMILY
+  GENUS
+  SPECIES
+}
+
+enum ValidationStatus {
+  PENDING
+  VALIDATED
+  REJECTED
 }
 
 enum Role {

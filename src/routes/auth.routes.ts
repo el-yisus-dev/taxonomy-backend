@@ -35,11 +35,11 @@ const router = Router();
  *               identifier:
  *                 type: string
  *                 description: Username or email of the user
- *                 example: moon@example.com
+ *                 example: yisusdev
  *               password:
  *                 type: string
  *                 description: User password
- *                 example: strongpassword123
+ *                 example: pelos2008
  *
  *     responses:
  *       200:
