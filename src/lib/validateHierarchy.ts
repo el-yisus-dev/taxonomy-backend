@@ -1,5 +1,5 @@
 import * as taxonRepository from '../repositories/taxon.repository.js';
-import { hierarchy, type TaxonRank } from "../types/Taxon.js";
+import { hierarchy, TaxaStatus, type TaxonRank } from "../types/Taxon.js";
 import { ApiError } from "../utils/ApiError.js";
 
 export const validateHierarchy = async (
@@ -23,7 +23,7 @@ export const validateHierarchy = async (
   }
 
   const parentLevel = hierarchy.indexOf(parent.rank);
-
+  
   if (parentLevel !== childLevel - 1) {
     throw new ApiError(
       400,

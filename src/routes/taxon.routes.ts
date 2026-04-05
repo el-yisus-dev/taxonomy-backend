@@ -26,19 +26,31 @@ const router = Router();
  *     summary: Create a new taxon
  *     description: |
  *       Creates a new taxon in the system.
- *       
- *       ### Rules:
+ *
+ *       ### Business rules:
  *       - rank must be a valid taxonomic rank.
  *       - name will be stored in lowercase.
- *       - parentId:
- *         - Must NOT be provided if rank is DOMAIN.
- *         - Optional for other ranks (can be assigned later).
  *       - A taxon with the same name and rank cannot exist.
- *       - Hierarchy must be valid (e.g., SPECIES cannot be parent of GENUS).
+ *
+ *       ### Parent rules:
+ *       - parentId is optional (taxon can be created without parent).
+ *       - If parentId is provided:
+ *         - The parent must exist.
+ *         - The parent must be exactly one level above the current rank.
+ *         - Example:
+ *           - GENUS → must have parent FAMILY
+ *           - PHYLUM → must have parent KINGDOM
+ *       - DOMAIN cannot have a parent.
+ *
+ *       ### Notes:
+ *       - The system does NOT allow hierarchy fallback (no skipping levels).
+ *       - Incomplete hierarchy is allowed (parent can be assigned later).
+ *
  *     tags:
  *       - Taxons
  *     security:
  *       - bearerAuth: []
+ *
  *     requestBody:
  *       required: true
  *       content:
@@ -61,9 +73,11 @@ const router = Router();
  *                 type: integer
  *                 nullable: true
  *                 example: 12
+ *                 description: Parent taxon ID (must be immediate upper rank)
  *               description:
  *                 type: string
- *                 example: "Microscopic single-celled organisms"
+ *                 nullable: true
+ *                 example: Microscopic single-celled organisms
  *
  *     responses:
  *       201:
@@ -98,7 +112,6 @@ const router = Router();
  *                         description:
  *                           type: string
  *                           nullable: true
- *                           example: "Microscopic single-celled organisms"
  *                         createdBy:
  *                           type: integer
  *                           example: 1
@@ -106,20 +119,19 @@ const router = Router();
  *       400:
  *         description: |
  *           Validation or hierarchy error:
- *           - Invalid hierarchy
+ *           - Invalid hierarchy (wrong parent rank)
  *           - ParentId provided for DOMAIN
- *
- *       404:
- *         description: |
- *           Resource not found:
- *           - Parent taxon not found
- *           - Taxon already exists at this rank
  *
  *       401:
  *         description: Unauthorized (missing or invalid token)
  *
+ *       404:
+ *         description: Parent taxon not found
+ *
  *       409:
- *         description: Duplicate taxon (unique constraint violation)
+ *         description: |
+ *           Conflict:
+ *           - Taxon already exists at this rank
  *
  *       500:
  *         description: Internal server error

@@ -11,13 +11,11 @@ export const createTaxon = async (
 ) => {
   const { name, rank, parentId, description } = data
   
-  
-  await validateHierarchy(rank, parentId);
-
-
-  if (parentId && rank === hierarchy[0]) {
-      throw new ApiError(400, `ParentId isn't necesary when you have a Domain`);
+  if (rank === hierarchy[0] && parentId != null) {
+    throw new ApiError(400, "DOMAIN cannot have a parent");
   }
+
+  await validateHierarchy(rank, parentId);
 
   const existTaxon = await taxonRepository.isExist(name.toLowerCase(), rank);
     
