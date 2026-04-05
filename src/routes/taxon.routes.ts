@@ -638,5 +638,4 @@ router.patch('/:id/status', asyncHandler(verifyToken), verifyRole([Role.ADMIN, R
  */
 router.patch('/:id/parent', asyncHandler(verifyToken), verifyRole([Role.ADMIN, Role.MODERATOR]), validate(idParamSchema, "params"), validate(updateTaxonParentSchema), asyncHandler(updateTaxaParent));
 
-
 export default router

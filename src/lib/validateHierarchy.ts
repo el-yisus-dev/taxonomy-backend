@@ -4,27 +4,30 @@ import { ApiError } from "../utils/ApiError.js";
 
 export const validateHierarchy = async (
   rank: TaxonRank,
-  parentId: number | null | undefined
+  parentId?: number | null
 ) => {
-  if (!parentId) return;
+  const childLevel = hierarchy.indexOf(rank);
+
+  if (childLevel === -1) {
+    throw new ApiError(500, "Hierarchy configuration error");
+  }
+
+  if (parentId == null) {
+    return;
+  }
 
   const parent = await taxonRepository.findById(parentId);
 
   if (!parent) {
-    throw new ApiError(404, 'Parent taxon not found');
+    throw new ApiError(404, "Parent taxon not found");
   }
 
   const parentLevel = hierarchy.indexOf(parent.rank);
-  const childLevel = hierarchy.indexOf(rank);
 
-  if (parentLevel === -1 || childLevel === -1) {
-    throw new ApiError(500, 'Hierarchy configuration error');
-  }
-
-  if (parentLevel >= childLevel) {
+  if (parentLevel !== childLevel - 1) {
     throw new ApiError(
       400,
-      `Invalid hierarchy: ${rank} cannot be child of ${parent.rank}`
+      `Invalid hierarchy: ${rank} must have a parent of rank ${hierarchy[childLevel - 1]}`
     );
   }
 };
