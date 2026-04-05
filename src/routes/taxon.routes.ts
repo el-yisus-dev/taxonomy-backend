@@ -3,7 +3,6 @@ import { Router } from 'express';
 import { verifyToken } from '../middleware/auth.middleware.js';
 import { asyncHandler } from '../utils/AsyncHandler.js';
 import { validate } from '../middleware/validate.middleware.js';
-
 import { createTaxonSchema, updateTaxonParentSchema, updateTaxonSchema, updateTaxonStatusSchema } from '../schemas/taxon.schema.js';
 import { createTaxon, deleteTaxon, getAllTaxons, getTaxonById, updateTaxaParent, updateTaxaStatus, updateTaxon } from '../controllers/taxon.controller.js';
 import { verifyRole } from '../middleware/acl.middleware.js';
@@ -531,7 +530,7 @@ router.delete('/:id', asyncHandler(verifyToken), validate(idParamSchema, "params
  *       - Once a taxon is VALIDATED or REJECTED, it cannot be modified again
  *
  *       ### Notes:
- *       - The `PENDING` status cannot be set via this endpoint
+ *       - The PENDING status cannot be set via this endpoint
  *       - Requires authentication
  *       - Strict validation is enforced for status values
  *

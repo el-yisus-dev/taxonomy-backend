@@ -1,11 +1,14 @@
+import { TaxonRank } from '../../generated/prisma/enums.js';
 import * as taxonRepository from '../repositories/taxon.repository.js';
-import { hierarchy, TaxaStatus, type TaxonRank } from "../types/Taxon.js";
+import { hierarchy } from "../types/Taxon.js";
 import { ApiError } from "../utils/ApiError.js";
 
 export const validateHierarchy = async (
   rank: TaxonRank,
   parentId?: number | null
 ) => {
+
+
   const childLevel = hierarchy.indexOf(rank);
 
   if (childLevel === -1) {
@@ -17,17 +20,21 @@ export const validateHierarchy = async (
   }
 
   const parent = await taxonRepository.findById(parentId);
-
+  
   if (!parent) {
     throw new ApiError(404, "Parent taxon not found");
   }
 
   const parentLevel = hierarchy.indexOf(parent.rank);
-  
+    
+  const expectedParent = hierarchy[childLevel - 1];
+
   if (parentLevel !== childLevel - 1) {
     throw new ApiError(
       400,
-      `Invalid hierarchy: ${rank} must have a parent of rank ${hierarchy[childLevel - 1]}`
+      rank === TaxonRank.DOMAIN
+        ? "DOMAIN cannot have a parent"
+        : `Invalid hierarchy: ${rank} must have a parent of rank ${expectedParent}`
     );
   }
 };
