@@ -150,17 +150,15 @@ export const getTaxonById = async (id: number) => {
 
 export const deleteTaxa = async (id: number, user: any) => {
   
-  const { userId, role } = user;
-
   const existinTaxa = await taxonRepository.findById(id);
 
   if (!existinTaxa) {
     throw new ApiError(404, "Taxa not found");
   }
 
-  const isOwner = existinTaxa.createdBy === userId;
+  const isOwner = existinTaxa.createdBy === user.id;
 
-  if (role === Role.USER) {
+  if (user.role === Role.USER) {
     if (!isOwner) {
       throw new ApiError(403, `You are not the owner to do this action.`);
     }
