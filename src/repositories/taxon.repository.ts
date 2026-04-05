@@ -49,24 +49,36 @@ export const findAllTaxons = async ({
   skip,
   limit,
   parentId,
-  includeCreator
+  includeCreator,
+  rank,
+  status
 }: {
   skip: number
   limit: number
   parentId: number | null | undefined
   includeCreator?: boolean
+  rank?: TaxonRank[]
+  status?: TaxaStatus[]
 }) => {
 
   return prisma.taxon.findMany({
     where: {
       deletedAt: null,
-      ...(parentId !== undefined && { parentId })
+
+      ...(parentId !== undefined && { parentId }),
+
+      ...(rank && { rank: { in: rank } }),
+
+      ...(status && { validationStatus: { in: status } })
     },
+
     skip,
     take: limit,
+
     orderBy: {
       createdAt: "desc"
     },
+
     select: {
       id: true,
       name: true,
@@ -89,15 +101,26 @@ export const findAllTaxons = async ({
   })
 };
 
+
 export const countTaxons = async ({
-  parentId
+  parentId,
+  rank,
+  status
 }: {
   parentId: number | null | undefined
+  rank?: TaxonRank[]
+  status?: TaxaStatus[]
 }) => {
+
   return prisma.taxon.count({
     where: {
       deletedAt: null,
-      ...(parentId !== undefined && { parentId })
+
+      ...(parentId !== undefined && { parentId }),
+
+      ...(rank && { rank: { in: rank } }),
+
+      ...(status && { validationStatus: { in: status } })
     }
   })
 };

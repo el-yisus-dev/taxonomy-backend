@@ -2,6 +2,8 @@ import type { Request, Response } from 'express';
 
 import * as taxonService from '../services/taxon.service.js';
 import { getPagination } from '../utils/Pagination.js';
+import { TaxaStatus, type TaxonRank } from '../types/Taxon.js';
+import { parseArray } from '../lib/convertArray.js';
 
 export const createTaxon = async (req: Request, res: Response) => {
   
@@ -19,28 +21,29 @@ export const createTaxon = async (req: Request, res: Response) => {
 
 export const getAllTaxons = async (req: Request, res: Response) => {
   const { page, limit, skip } = getPagination(req.query);
-  
-  const parentId = req.query.parentId === 'null' ? 
-    null : 
-    req.query.parentId !== undefined  
-      ? Number(req.query.parentId) 
-      : undefined
-  
-  const includeCreator = req.query.include === 'creator';
 
-  const result = await taxonService.getAllTaxons({
-      page,
-      limit,
-      skip,
-      parentId,
-      includeCreator
-    })
+  const { rank, status, parentId, include } = req.query as any;
   
-    res.json({
-      status: "success",
-      data: result.items,
-      meta: result.meta
-    })
+  const includeCreator = include === "creator";
+  const paresedParentId = (parentId && typeof "number") && Number(parentId);
+  const statusArray = parseArray(status);
+  const rankArray = parseArray(rank);
+  
+  const result = await taxonService.getAllTaxons({
+    page,
+    limit,
+    skip,
+    ...(parentId && { parentId: paresedParentId }),
+    ...(includeCreator && { includeCreator }),
+    ...(rank && { rank: rankArray }),
+    ...(status && { status: statusArray }),
+  });
+
+  res.json({
+    status: "success",
+    data: result.items,
+    meta: result.meta,
+  });
 };
 
 export const updateTaxon = async (req: Request, res: Response) => {

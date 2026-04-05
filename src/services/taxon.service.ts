@@ -1,6 +1,6 @@
 import { Role } from '@prisma/client';
 import * as taxonRepository from '../repositories/taxon.repository.js';
-import { hierarchy, TaxaStatus, type CreateTaxonDTO, type UpdateTaxonDTO } from '../types/Taxon.js';
+import { hierarchy, TaxaStatus, type CreateTaxonDTO, type TaxonRank, type UpdateTaxonDTO } from '../types/Taxon.js';
 import { ApiError } from '../utils/ApiError.js';
 import { getTotalPages } from '../utils/Pagination.js';
 import { validateHierarchy } from '../lib/validateHierarchy.js';
@@ -38,21 +38,39 @@ export const getAllTaxons = async ({
   limit,
   skip,
   parentId,
-  includeCreator
+  includeCreator,
+  rank,
+  status,
 }: {
-  page: number
-  limit: number
-  skip: number
-  parentId: number | null | undefined
-  includeCreator?: boolean
-
+  page: number;
+  limit: number;
+  skip: number;
+  parentId: number | null | undefined;
+  includeCreator?: boolean;
+  rank?: TaxonRank[];
+  status?: TaxaStatus[];
 }) => {
+  const filters = {
+    skip,
+    limit,
+    ...(parentId && { parentId }),
+    ...(includeCreator !== undefined && { includeCreator }),
+    ...(rank && { rank }),
+    ...(status && { status }),
+  };
+
+  const countFilters = {
+    ...(parentId && { parentId }),
+    ...(rank && { rank }),
+    ...(status && { status }),
+  };
 
   const [taxons, total] = await Promise.all([
-    // @ts-ignore
-    taxonRepository.findAllTaxons({ skip, limit, parentId, includeCreator }),
-    taxonRepository.countTaxons({ parentId })
-  ])
+    //@ts-ignore
+    taxonRepository.findAllTaxons(filters),
+    //@ts-ignore
+    taxonRepository.countTaxons(countFilters),
+  ]);
 
   const totalPages = getTotalPages(total, limit);
 
@@ -62,9 +80,9 @@ export const getAllTaxons = async ({
       page,
       limit,
       total,
-      totalPages
-    }
-  }
+      totalPages,
+    },
+  };
 };
 
 export const updateTaxon = async (

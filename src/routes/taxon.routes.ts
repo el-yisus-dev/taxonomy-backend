@@ -148,7 +148,8 @@ router.post('/', asyncHandler(verifyToken), validate(createTaxonSchema), asyncHa
  *       
  *       ### Features:
  *       - Pagination via page and limit (internally uses skip)
- *       - Optional filtering by parentId
+ *       - Optional filtering by parentId, rank, and status
+ *       - Supports multiple values for rank and status (comma-separated)
  *       - Optional inclusion of related data (creator)
  *       - Sorted by newest first
  *       - Soft-deleted records are excluded
@@ -159,6 +160,14 @@ router.post('/', asyncHandler(verifyToken), validate(createTaxonSchema), asyncHa
  *       - parentId=null → returns taxons without parent (roots or unassigned)
  *       - parentId=<number> → returns direct children of that taxon
  *
+ *       ### rank behavior:
+ *       - Accepts comma-separated values
+ *       - Example: rank=GENUS,SPECIES
+ *
+ *       ### status behavior:
+ *       - Accepts comma-separated values
+ *       - Example: status=PENDING,VALIDATED
+ *
  *       ### include behavior:
  *       - include=creator → includes creator user info
  *       
@@ -166,6 +175,7 @@ router.post('/', asyncHandler(verifyToken), validate(createTaxonSchema), asyncHa
  *       - Taxons
  *     security:
  *       - bearerAuth: []
+ *
  *     parameters:
  *       - in: query
  *         name: page
@@ -193,6 +203,28 @@ router.post('/', asyncHandler(verifyToken), validate(createTaxonSchema), asyncHa
  *           Filter by parent taxon:
  *           - Use a number to get children of a taxon
  *           - Use "null" to get taxons without parent
+ *
+ *       - in: query
+ *         name: rank
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: GENUS,SPECIES
+ *         description: |
+ *           Filter by rank (comma-separated values).
+ *           Allowed values:
+ *           DOMAIN, KINGDOM, PHYLUM, CLASS, ORDER, FAMILY, GENUS, SPECIES
+ *
+ *       - in: query
+ *         name: status
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: PENDING,VALIDATED
+ *         description: |
+ *           Filter by validation status (comma-separated values).
+ *           Allowed values:
+ *           PENDING, VALIDATED, REJECTED
  *
  *       - in: query
  *         name: include
@@ -278,7 +310,11 @@ router.post('/', asyncHandler(verifyToken), validate(createTaxonSchema), asyncHa
  *                       example: 10
  *
  *       400:
- *         description: Invalid query parameters (e.g., parentId is not a number)
+ *         description: |
+ *           Invalid query parameters:
+ *           - Invalid parentId
+ *           - Invalid rank value
+ *           - Invalid status value
  *
  *       401:
  *         description: Unauthorized (missing or invalid token)
