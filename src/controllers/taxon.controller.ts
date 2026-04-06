@@ -2,7 +2,6 @@ import type { Request, Response } from 'express';
 
 import * as taxonService from '../services/taxon.service.js';
 import { getPagination } from '../utils/Pagination.js';
-import { TaxaStatus, type TaxonRank } from '../types/Taxon.js';
 import { parseArray } from '../lib/convertArray.js';
 
 export const createTaxon = async (req: Request, res: Response) => {

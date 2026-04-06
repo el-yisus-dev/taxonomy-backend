@@ -1,4 +1,4 @@
-import { Role } from '@prisma/client';
+import { Role } from '../types/User.js';
 import * as taxonRepository from '../repositories/taxon.repository.js';
 import { hierarchy, TaxaStatus, type CreateTaxonDTO, type TaxonRank, type UpdateTaxonDTO } from '../types/Taxon.js';
 import { ApiError } from '../utils/ApiError.js';
