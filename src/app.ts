@@ -39,7 +39,7 @@ routerApi(app);
 
 // Middleware to handle errors
 app.use(errorMiddleware);
-
+console.log(config)
 app.listen(config.PORT, () => {
     console.log(`working on: http://localhost:${config.PORT}/api/v1/docs`);
 })

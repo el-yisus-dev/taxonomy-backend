@@ -12,7 +12,7 @@ export const validateUserCredentials = async (data: LoginData) => {
   const user = await userRepository.findUserWithPassword(identifier);
 
   if (user === null || user === undefined) {
-    throw new ApiError(401, "Invalid credentials");
+    throw new ApiError(401, "User not found.");
   }
 
   const isValid = await bcrypt.compare(password, user.password);

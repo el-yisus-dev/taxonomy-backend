@@ -31,12 +31,29 @@ model User {
 
   taxa      Taxon[]
 
+  emailVerificationTokens EmailVerificationToken[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
 
   @@index([email])
   @@index([username])
+}
+
+model EmailVerificationToken {
+  id        Int      @id @default(autoincrement())
+
+  token     String
+  userId    Int
+
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([token])
+  @@index([userId])
 }
 
 model Taxon {

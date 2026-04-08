@@ -1,5 +1,4 @@
 import { prisma } from "../lib/prisma.js"
-import type { updateUserDTO } from "../types/User.js";
 
 export const createUser = async (data: {
   email: string
