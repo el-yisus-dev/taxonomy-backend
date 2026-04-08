@@ -1,9 +1,12 @@
 import bcrypt from "bcrypt";
 
 import * as userRepository from "../repositories/user.repository.js";
+import * as emailVerificationRepository from "../repositories/emailVerification.repository.js";
+
 import type { LoginData } from "../types/User.js";
 import { ApiError } from "../utils/ApiError.js";
 import { generateAccessToken } from "../utils/Jwt.js";
+import { hashToken } from "../utils/TokenEmail.js";
 
 
 export const validateUserCredentials = async (data: LoginData) => {
@@ -41,4 +44,21 @@ export const validateUserCredentials = async (data: LoginData) => {
   };
 
   return { user: safeUser, accessToken };
+};
+
+
+export const verifyEmail = async (token: string) => {
+  const hashedToken = hashToken(token);
+
+  const record = await emailVerificationRepository.emailVerificationToken(hashedToken);
+
+  if (!record) {
+    throw new ApiError(400, "Invalid or expired token");
+  }
+
+  await userRepository.updateUserVerified(record.userId);
+
+  await emailVerificationRepository.deleteVerificationToken(record.id);
+
+  return { verified: true };
 };

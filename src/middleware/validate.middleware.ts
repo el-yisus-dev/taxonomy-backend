@@ -18,8 +18,12 @@ export const validate = (schema: ZodType, property: "body" | "params" | "query" 
       throw new ApiError(400, "Validation error", errors)
     }
 
-    req[property] = result.data
-
+    if (property === "body") {
+      req.body = result.data;
+    } else {
+      Object.keys(req[property]).forEach(key => delete req[property][key]);
+      Object.assign(req[property], result.data);
+    }
     next()
   }
 }

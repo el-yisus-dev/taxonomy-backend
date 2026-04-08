@@ -13,3 +13,14 @@ export const login = async (req: Request, res: Response) => {
         accessToken 
     }});
 }
+
+export const verifyEmail = async (req: Request, res: Response) => {
+  const token = req.query.token as string;
+  
+  await authService.verifyEmail(token);
+
+  return res.status(200).json({
+    status: "success",
+    message: "Email verified successfully"
+  });
+};

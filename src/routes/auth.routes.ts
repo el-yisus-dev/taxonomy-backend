@@ -1,8 +1,9 @@
 import { Router } from "express";
+
 import { validate } from "../middleware/validate.middleware.js";
-import { loginUserSchema } from "../schemas/user.schema.js";
+import { login, verifyEmail } from "../controllers/auth.controller.js";
+import { loginUserSchema, paramEmailTokenSchema } from "../schemas/auth.schema.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
-import { login } from "../controllers/auth.controller.js";
 
 
 /**
@@ -108,6 +109,59 @@ const router = Router();
  */
 router.post("/login", validate(loginUserSchema), asyncHandler(login));
 
-
+/**
+ * @swagger
+ * /auth/verify-email:
+ *   get:
+ *     summary: Verify user email using verification token
+ *     description: |
+ *       Verifies a user's email address using a token sent via email during registration.
+ *       The token must be valid and not expired.
+ *
+ *     tags:
+ *       - Auth
+ *
+ *     parameters:
+ *       - in: query
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Email verification token
+ *         example: 9f8c7a6b5e4d3c2b1a...
+ *
+ *     responses:
+ *       200:
+ *         description: Email successfully verified
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Email verified successfully
+ *
+ *       400:
+ *         description: Invalid or expired token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Invalid or expired token
+ *
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/verify-email", validate(paramEmailTokenSchema, "query"), asyncHandler(verifyEmail))
 
 export default router;

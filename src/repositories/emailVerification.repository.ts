@@ -18,3 +18,20 @@ export const createEmailVerificationRecord = async (data: {
         data
     })
 }
+
+export const emailVerificationToken = async (token: string) => {
+    return prisma.emailVerificationToken.findFirst({
+        where: {
+          token: token,
+          expiresAt: {
+            gte: new Date(),
+          },
+        },
+      });
+}
+
+export const deleteVerificationToken = async (id: number) => {
+    return prisma.emailVerificationToken.delete({
+    where: { id: id },
+  });
+}

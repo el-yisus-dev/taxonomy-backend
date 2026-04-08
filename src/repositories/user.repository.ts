@@ -139,3 +139,12 @@ export const softDeleteUser = async (id: number) => {
     }
   })
 };
+
+export const updateUserVerified = async (userId: number) => {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { 
+      emailVerified: true
+     },
+  });
+}
