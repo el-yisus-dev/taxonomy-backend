@@ -17,3 +17,11 @@ export const paramEmailTokenSchema = z.object({
         .trim()
         .min(10, { error: "invalid token format"})
 })
+
+export const emailTokenSchema = z.object({
+  email: z
+    .string({ error: "The email is required" })
+    .trim()
+    .min(1, { error: "The email is required" })
+    .email({ error: "Invalid email format" }),
+})

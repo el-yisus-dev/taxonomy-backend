@@ -6,7 +6,8 @@ import * as emailVerificationRepository from "../repositories/emailVerification.
 import type { LoginData } from "../types/User.js";
 import { ApiError } from "../utils/ApiError.js";
 import { generateAccessToken } from "../utils/Jwt.js";
-import { hashToken } from "../utils/TokenEmail.js";
+import { generateToken, hashToken } from "../utils/TokenEmail.js";
+import { sendVerificationEmail } from "./email.service.js";
 
 
 export const validateUserCredentials = async (data: LoginData) => {
@@ -61,4 +62,29 @@ export const verifyEmail = async (token: string) => {
   await emailVerificationRepository.deleteVerificationToken(record.id);
 
   return { verified: true };
+};
+
+export const resendVerification = async (email: string) => {
+  const user = await userRepository.findUserByEmail(email);
+  
+  if (!user) {
+    return;
+  }
+
+  if (user.emailVerified) {
+    throw new ApiError(400, "Email already verified");
+  }
+
+  await emailVerificationRepository.deleteUserTokensRecords(user.id);
+
+  const rawToken = generateToken();
+  const hashedToken = hashToken(rawToken);
+
+  await emailVerificationRepository.createEmailVerificationRecord({
+    token: hashedToken,
+    userId: user.id,
+    expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+  });
+
+  await sendVerificationEmail(user, rawToken);
 };

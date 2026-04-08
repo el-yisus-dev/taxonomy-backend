@@ -1,8 +1,8 @@
 import { Router } from "express";
 
 import { validate } from "../middleware/validate.middleware.js";
-import { login, verifyEmail } from "../controllers/auth.controller.js";
-import { loginUserSchema, paramEmailTokenSchema } from "../schemas/auth.schema.js";
+import { login, resendVerification, verifyEmail } from "../controllers/auth.controller.js";
+import { emailTokenSchema, loginUserSchema, paramEmailTokenSchema } from "../schemas/auth.schema.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 
 
@@ -163,5 +163,50 @@ router.post("/login", validate(loginUserSchema), asyncHandler(login));
  *         description: Internal server error
  */
 router.get("/verify-email", validate(paramEmailTokenSchema, "query"), asyncHandler(verifyEmail))
+
+/**
+ * @swagger
+ * /auth/resend-verification:
+ *   post:
+ *     summary: Resend email verification token
+ *     description: Sends a new email verification token if the user is not yet verified
+ *     tags:
+ *       - Auth
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *
+ *     responses:
+ *       200:
+ *         description: Verification email sent
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Verification email sent
+ *
+ *       400:
+ *         description: Email already verified or invalid
+ *
+ *       500:
+ *         description: Internal server error
+ */
+router.post("/resend-verification", validate(emailTokenSchema), asyncHandler(resendVerification))
 
 export default router;

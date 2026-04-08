@@ -148,3 +148,11 @@ export const updateUserVerified = async (userId: number) => {
      },
   });
 }
+
+export const findUserByEmail = (email: string) => {
+  return prisma.user.findFirst({
+    where: {
+      email
+    }
+  })
+}
