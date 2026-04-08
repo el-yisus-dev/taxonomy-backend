@@ -22,21 +22,42 @@ export const getAllTaxons = async (req: Request, res: Response) => {
   const { page, limit, skip } = getPagination(req.query);
 
   const { rank, status, parentId, include } = req.query as any;
-  
+
   const includeCreator = include === "creator";
-  const paresedParentId = (parentId && typeof "number") && Number(parentId);
+
+  const parsedParentId =
+    parentId === undefined
+      ? undefined
+      : parentId === "null"
+      ? null
+      : Number(parentId);
+
   const statusArray = parseArray(status);
   const rankArray = parseArray(rank);
-  
-  const result = await taxonService.getAllTaxons({
+
+  const filters: any = {
     page,
     limit,
     skip,
-    ...(parentId && { parentId: paresedParentId }),
-    ...(includeCreator && { includeCreator }),
-    ...(rank && { rank: rankArray }),
-    ...(status && { status: statusArray }),
-  });
+  };
+
+  if (parsedParentId !== undefined) {
+    filters.parentId = parsedParentId;
+  }
+
+  if (includeCreator) {
+    filters.includeCreator = true;
+  }
+
+  if (rankArray?.length) {
+    filters.rank = rankArray;
+  }
+
+  if (statusArray?.length) {
+    filters.status = statusArray;
+  }
+
+  const result = await taxonService.getAllTaxons(filters);
 
   res.json({
     status: "success",

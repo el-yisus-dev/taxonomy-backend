@@ -53,14 +53,14 @@ export const getAllTaxons = async ({
   const filters = {
     skip,
     limit,
-    ...(parentId && { parentId }),
+    ...(parentId !== undefined && { parentId }),
     ...(includeCreator !== undefined && { includeCreator }),
     ...(rank && { rank }),
     ...(status && { status }),
   };
 
   const countFilters = {
-    ...(parentId && { parentId }),
+    ...(parentId !== undefined && { parentId }),
     ...(rank && { rank }),
     ...(status && { status }),
   };
