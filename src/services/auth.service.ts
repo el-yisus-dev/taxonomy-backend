@@ -104,11 +104,10 @@ export const requestPasswordReset = async (email: string) => {
   if (!user.emailVerified) {
     throw new ApiError(401, "Your account is not verified.");
   }
-  
+
   await resetRepo.deleteUserResetTokens(user.id);
 
   const otp = generateOTP();
-  console.log(otp);
 
   const hashed = hashToken(otp);
 
@@ -118,7 +117,7 @@ export const requestPasswordReset = async (email: string) => {
     expiresAt: new Date(Date.now() + 1000 * 60 * 10), // 10 min
   });
 
-  // await sendResetPasswordEmail(user, otp);
+  await sendResetPasswordEmail(user, otp);
 };
 
 
