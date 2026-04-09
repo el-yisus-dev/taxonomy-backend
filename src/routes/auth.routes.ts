@@ -1,8 +1,8 @@
 import { Router } from "express";
 
 import { validate } from "../middleware/validate.middleware.js";
-import { login, resendVerification, verifyEmail } from "../controllers/auth.controller.js";
-import { emailTokenSchema, loginUserSchema, paramEmailTokenSchema } from "../schemas/auth.schema.js";
+import { login, requestPasswordReset, resendVerification, resetPassword, verifyEmail } from "../controllers/auth.controller.js";
+import { emailTokenSchema, loginUserSchema, paramEmailTokenSchema, resetPasswordSchema } from "../schemas/auth.schema.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 
 
@@ -111,7 +111,7 @@ router.post("/login", validate(loginUserSchema), asyncHandler(login));
 
 /**
  * @swagger
- * /auth/verify-email:
+ * /auth/email-verification/confirm:
  *   get:
  *     summary: Verify user email using verification token
  *     description: |
@@ -162,11 +162,11 @@ router.post("/login", validate(loginUserSchema), asyncHandler(login));
  *       500:
  *         description: Internal server error
  */
-router.get("/verify-email", validate(paramEmailTokenSchema, "query"), asyncHandler(verifyEmail))
+router.get("/email-verification/confirm", validate(paramEmailTokenSchema, "query"), asyncHandler(verifyEmail))
 
 /**
  * @swagger
- * /auth/resend-verification:
+ * /auth/email-verification/resend:
  *   post:
  *     summary: Resend email verification token
  *     description: Sends a new email verification token if the user is not yet verified
@@ -207,6 +207,67 @@ router.get("/verify-email", validate(paramEmailTokenSchema, "query"), asyncHandl
  *       500:
  *         description: Internal server error
  */
-router.post("/resend-verification", validate(emailTokenSchema), asyncHandler(resendVerification))
+router.post("/email-verification/resend", validate(emailTokenSchema), asyncHandler(resendVerification))
+
+/**
+ * @swagger
+ * /auth/password-reset/request:
+ *   post:
+ *     summary: Request password reset
+ *     description: Sends an OTP code to the user's email
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         description: OTP sent
+ */
+router.post("/password-reset/request", validate(emailTokenSchema), asyncHandler(requestPasswordReset))
+
+/**
+ * @swagger
+ * /auth/password-reset/confirm:
+ *   post:
+ *     summary: Reset user password using OTP
+ *     description: Validates OTP and updates password
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - code
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *               code:
+ *                 type: string
+ *                 example: "123456"
+ *               password:
+ *                 type: string
+ *                 example: newpassword123
+ *     responses:
+ *       200:
+ *         description: Password updated successfully
+ */
+router.post("/password-reset/confirm", validate(resetPasswordSchema), asyncHandler(resetPassword))
+
 
 export default router;

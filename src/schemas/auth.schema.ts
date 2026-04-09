@@ -25,3 +25,19 @@ export const emailTokenSchema = z.object({
     .min(1, { error: "The email is required" })
     .email({ error: "Invalid email format" }),
 })
+
+export const resetPasswordSchema = z.object({
+  email: z
+    .string({ error: "The email is required" })
+    .trim()
+    .min(1, { error: "The email is required" })
+    .email({ error: "Invalid email format" }),
+  code: z
+    .string({ error: "the code is required"})
+    .min(6, { error: "It must have 6 characters"})
+    .max(6, { error: "It must have 6 characters"}),
+  password: z
+    .string({ error: "The password is required" })
+    .trim()
+    .min(1, { error: "The password is required" })
+});

@@ -32,7 +32,8 @@ model User {
   taxa      Taxon[]
 
   emailVerificationTokens EmailVerificationToken[]
-
+  passwordResetTokens PasswordResetToken[]
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
@@ -54,6 +55,21 @@ model EmailVerificationToken {
 
   @@index([token])
   @@index([userId])
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+
+  token     String
+  userId    Int
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([token])
 }
 
 model Taxon {

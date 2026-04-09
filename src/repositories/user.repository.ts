@@ -51,6 +51,7 @@ export const findUserWithPassword = async (identifier: string) => {
       avatarUrl: true,
       role: true,
       password: true,
+      emailVerified: true
     },
   });
 
@@ -119,7 +120,8 @@ export const updateUser = async (id: number, data: Partial<{ name: string; lastN
 export const updateLastLoginDate = async (id: number) => {
   return prisma.user.update({
     where: {
-      id
+      id,
+      deletedAt: null
     },
     data: {
       lastLoginAt: new Date()
@@ -152,7 +154,22 @@ export const updateUserVerified = async (userId: number) => {
 export const findUserByEmail = (email: string) => {
   return prisma.user.findFirst({
     where: {
-      email
+      email,
+      deletedAt: null,
+      isActive: true
+    }
+  })
+}
+
+export const updateUserPassword = (userId: number, password: string) => {
+  return prisma.user.update({
+    where: {
+      id: userId,
+      deletedAt: null,
+      isActive: true
+    },
+    data: {
+      password
     }
   })
 }

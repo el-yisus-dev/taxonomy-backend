@@ -75,3 +75,16 @@ export const sendVerificationEmail = async (user: any, token: string) => {
   });
 
 };
+
+export const sendResetPasswordEmail = async (user: any, otp: string) => {
+  await transporter.sendMail({
+    to: user.email,
+    subject: "Password reset code",
+    html: `
+      <h2>Password Reset</h2>
+      <p>Your verification code is:</p>
+      <h1>${otp}</h1>
+      <p>This code expires in 10 minutes</p>
+    `,
+  });
+};

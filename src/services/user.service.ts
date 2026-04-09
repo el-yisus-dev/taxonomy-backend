@@ -7,6 +7,7 @@ import { getTotalPages } from "../utils/Pagination.js";
 import { generateToken, hashToken } from "../utils/TokenEmail.js";
 import { sendVerificationEmail } from "./email.service.js";
 import type { CreateUserDTO, updateUserDTO } from "../types/User.js";
+import { hashPassword } from "../utils/Hashpassord.js";
 
 
 export const createUser = async (data: CreateUserDTO) => {
@@ -23,7 +24,7 @@ export const createUser = async (data: CreateUserDTO) => {
     throw new ApiError(409, "Username already taken")
   }
 
-  const hashedPassword = await bcrypt.hash(data.password, 10)
+  const hashedPassword = await hashPassword(data.password);
 
   const user = await userRepository.createUser({
     ...data,
