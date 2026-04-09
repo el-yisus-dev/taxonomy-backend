@@ -4,6 +4,7 @@ import { validate } from "../middleware/validate.middleware.js";
 import { login, requestPasswordReset, resendVerification, resetPassword, verifyEmail } from "../controllers/auth.controller.js";
 import { emailTokenSchema, loginUserSchema, paramEmailTokenSchema, resetPasswordSchema } from "../schemas/auth.schema.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
+import { sentEmailsRateLimiter } from "../middleware/rateLimit.middleware.js";
 
 
 /**
@@ -162,7 +163,7 @@ router.post("/login", validate(loginUserSchema), asyncHandler(login));
  *       500:
  *         description: Internal server error
  */
-router.get("/email-verification/confirm", validate(paramEmailTokenSchema, "query"), asyncHandler(verifyEmail))
+router.get("/email-verification/confirm", sentEmailsRateLimiter, validate(paramEmailTokenSchema, "query"), asyncHandler(verifyEmail))
 
 /**
  * @swagger
@@ -207,7 +208,7 @@ router.get("/email-verification/confirm", validate(paramEmailTokenSchema, "query
  *       500:
  *         description: Internal server error
  */
-router.post("/email-verification/resend", validate(emailTokenSchema), asyncHandler(resendVerification))
+router.post("/email-verification/resend", sentEmailsRateLimiter, validate(emailTokenSchema), asyncHandler(resendVerification))
 
 /**
  * @swagger
@@ -233,7 +234,7 @@ router.post("/email-verification/resend", validate(emailTokenSchema), asyncHandl
  *       200:
  *         description: OTP sent
  */
-router.post("/password-reset/request", validate(emailTokenSchema), asyncHandler(requestPasswordReset))
+router.post("/password-reset/request", sentEmailsRateLimiter, validate(emailTokenSchema), asyncHandler(requestPasswordReset))
 
 /**
  * @swagger
