@@ -44,3 +44,22 @@ export const getAllObservations = async ({ page, limit, skip }: any) => {  const
     }
   }
 }
+
+export const getObservationsMap = async ({
+  swLat,
+  swLng,
+  neLat,
+  neLng,
+  limit
+}: any) => {
+
+  const safeLimit = Math.min(limit || 200, 500);
+
+  return await observationRepository.findObservationsInArea({
+    swLat,
+    swLng,
+    neLat,
+    neLng,
+    limit: safeLimit
+  });
+};

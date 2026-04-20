@@ -35,20 +35,19 @@ export const getAllObservations = async (req: Request, res: Response) => {
   })
 };
 
-/*export const getObservationsMap = async (req, res) => {
+export const getObservationsMap = async (req: Request, res: Response) => {
+  const { swLat, swLng, neLat, neLng, limit } = req.query;
 
-  try {
-    const { swLat, swLng, neLat, neLng } = req.query;
+  const data = await observationService.getObservationsMap({
+    swLat,
+    swLng,
+    neLat,
+    neLng,
+    limit
+  });
 
-    const data = await service.getObservationsInAreaService({
-      swLat: Number(swLat),
-      swLng: Number(swLng),
-      neLat: Number(neLat),
-      neLng: Number(neLng)
-    });
-
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ message: "Error" });
-  }
-};*/
+  res.json({
+    status: "success",
+    data
+  });
+};

@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { validate } from "../middleware/validate.middleware.js";
-import { createObservationSchema } from "../schemas/observation.schema.js";
+import { createObservationSchema, getObservationsMapSchemaRefined } from "../schemas/observation.schema.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import { verifyToken } from "../middleware/auth.middleware.js";
-import { createObservation, getAllObservations } from "../controllers/observation.controller.js";
+import { createObservation, getAllObservations, getObservationsMap } from "../controllers/observation.controller.js";
 
 /**
  * @swagger
@@ -285,4 +285,88 @@ router.post("/", asyncHandler(verifyToken), validate(createObservationSchema), a
  */
 router.get("/", asyncHandler(verifyToken), asyncHandler(getAllObservations));
 
+/**
+ * @swagger
+ * /observations/map:
+ *   get:
+ *     summary: Get observations for map viewport
+ *     description: |
+ *       Retrieves observations within a geographic bounding box.
+ *
+ *       ### Core concept:
+ *       - This endpoint is optimized for map rendering.
+ *       - It returns lightweight data for performance.
+ *
+ *       ### Bounding box:
+ *       - Defined by southwest (sw) and northeast (ne) coordinates.
+ *       - Must form a valid rectangle:
+ *         - swLat < neLat
+ *         - swLng < neLng
+ *
+ *       ### Performance rules:
+ *       - Maximum 500 results per request.
+ *       - Only minimal fields are returned.
+ *       - Only 1 image per observation is included.
+ *
+ *       ### Notes:
+ *       - Use this endpoint for maps, not listings.
+ *
+ *     tags:
+ *       - Observations
+ *     security:
+ *       - bearerAuth: []
+ *
+ *     parameters:
+ *       - in: query
+ *         name: swLat
+ *         required: true
+ *         schema:
+ *           type: number
+ *           example: 19.0
+ *
+ *       - in: query
+ *         name: swLng
+ *         required: true
+ *         schema:
+ *           type: number
+ *           example: -99.0
+ *
+ *       - in: query
+ *         name: neLat
+ *         required: true
+ *         schema:
+ *           type: number
+ *           example: 21.0
+ *
+ *       - in: query
+ *         name: neLng
+ *         required: true
+ *         schema:
+ *           type: number
+ *           example: -97.0
+ *
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: number
+ *           maximum: 500
+ *           default: 200
+ *
+ *     responses:
+ *       200:
+ *         description: Observations retrieved successfully
+ *
+ *       400:
+ *         description: Invalid bounding box or parameters
+ *
+ *       401:
+ *         description: Unauthorized
+ *
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/map", asyncHandler(verifyToken), validate(getObservationsMapSchemaRefined, "query"),
+  asyncHandler(getObservationsMap)
+);
 export default router;

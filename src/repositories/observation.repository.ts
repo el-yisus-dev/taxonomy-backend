@@ -40,3 +40,41 @@ export const findAllObservations = ({ skip, limit }: { skip: number; limit: numb
 export const countObservations = () => {
   return prisma.observation.count();
 };
+
+export const findObservationsInArea = ({
+  swLat,
+  swLng,
+  neLat,
+  neLng,
+  limit
+}: any) => {
+  return prisma.observation.findMany({
+    where: {
+      latitude: {
+        gte: swLat,
+        lte: neLat
+      },
+      longitude: {
+        gte: swLng,
+        lte: neLng
+      }
+    },
+    take: limit,
+    orderBy: {
+      observedAt: "desc"
+    },
+    select: {
+      id: true,
+      latitude: true,
+      longitude: true,
+      observedAt: true,
+
+      images: {
+        take: 1,
+        select: {
+          url: true
+        }
+      }
+    }
+  });
+};
