@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { validate } from "../middleware/validate.middleware.js";
-import { createObservationSchema, getObservationsMapSchemaRefined } from "../schemas/observation.schema.js";
+import { createObservationSchema, getObservationsMapSchemaRefined, updateObservationSchema } from "../schemas/observation.schema.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import { verifyToken } from "../middleware/auth.middleware.js";
-import { createObservation, getAllObservations, getObservationsMap } from "../controllers/observation.controller.js";
+import { createObservation, getAllObservations, getObservationsMap, updateObservation } from "../controllers/observation.controller.js";
 
 /**
  * @swagger
@@ -369,4 +369,68 @@ router.get("/", asyncHandler(verifyToken), asyncHandler(getAllObservations));
 router.get("/map", asyncHandler(verifyToken), validate(getObservationsMapSchemaRefined, "query"),
   asyncHandler(getObservationsMap)
 );
+
+/**
+ * @swagger
+ * /observations/{id}:
+ *   patch:
+ *     summary: Update an observation
+ *     description: |
+ *       Updates editable fields of an observation.
+ *
+ *       ### Editable fields:
+ *       - description
+ *       - placeName
+ *
+ *       ### Restrictions:
+ *       - Only the owner can update the observation.
+ *       - Location and observedAt are immutable.
+ *
+ *       ### Notes:
+ *       - This endpoint performs a partial update.
+ *       - At least one field must be provided.
+ *
+ *     tags:
+ *       - Observations
+ *     security:
+ *       - bearerAuth: []
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               description:
+ *                 type: string
+ *               placeName:
+ *                 type: string
+ *
+ *     responses:
+ *       200:
+ *         description: Observation updated successfully
+ *
+ *       400:
+ *         description: Validation error
+ *
+ *       401:
+ *         description: Unauthorized
+ *
+ *       404:
+ *         description: Observation not found
+ *
+ *       500:
+ *         description: Internal server error
+ */
+router.patch("/:id", asyncHandler(verifyToken), validate(updateObservationSchema), asyncHandler(updateObservation));
+
 export default router;

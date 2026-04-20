@@ -86,3 +86,30 @@ export const getObservationsMapSchemaRefined =
       path: ["swLat"]
     }
   );
+
+export const updateObservationSchema = z.object({
+  description: z
+    .string()
+    .trim()
+    .min(1, "description cannot be empty")
+    .optional(),
+
+  placeName: z
+    .string()
+    .trim()
+    .optional(),
+
+  images: z
+    .array(
+      z.object({
+        url: z.string().url("Invalid image URL"),
+        providerId: z.string().optional()
+      })
+    )
+    .optional()
+}).refine(
+  (data) => Object.keys(data).length > 0,
+  {
+    message: "At least one field must be provided for update"
+  }
+);

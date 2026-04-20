@@ -1,4 +1,5 @@
 import * as observationRepository from "../repositories/observation.repository.js";
+import { ApiError } from "../utils/ApiError.js";
 import { getTotalPages } from "../utils/Pagination.js";
 
 export const createObservationService = async (input: any, userId: number) => {
@@ -62,4 +63,28 @@ export const getObservationsMap = async ({
     neLng,
     limit: safeLimit
   });
+};
+
+export const updateObservation = async (id: number, input: any, userId: number) => {
+  const existing = await observationRepository.findById(id);
+
+  if (!existing) {
+    throw new ApiError(404, "Observation not found");
+  }
+
+  if (existing.userId !== userId) {
+    throw new ApiError(401, "Unauthorized");
+  }
+
+  const data: any = {};
+
+  if (input.description !== undefined) {
+    data.description = input.description;
+  }
+
+  if (input.placeName !== undefined) {
+    data.placeName = input.placeName;
+  }
+
+  return await observationRepository.updateObservation(id, data);
 };

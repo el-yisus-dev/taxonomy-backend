@@ -78,3 +78,19 @@ export const findObservationsInArea = ({
     }
   });
 };
+
+export const findById = (id: number) => {
+  return prisma.observation.findUnique({
+    where: { id }
+  });
+};
+
+export const updateObservation = (id: number, data: any) => {
+  return prisma.observation.update({
+    where: { id },
+    data,
+    include: {
+      images: true
+    }
+  });
+};

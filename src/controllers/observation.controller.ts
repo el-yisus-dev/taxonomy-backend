@@ -51,3 +51,21 @@ export const getObservationsMap = async (req: Request, res: Response) => {
     data
   });
 };
+
+export const updateObservation = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { user } = res.locals;
+
+  const observation = await observationService.updateObservation(
+    Number(id),
+    req.body,
+    user.id
+  );
+
+  res.json({
+    status: "success",
+    data: {
+      observation
+    }
+  });
+};
