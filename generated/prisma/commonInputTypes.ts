@@ -253,6 +253,50 @@ export type EnumValidationStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumValidationStatusFilter<$PrismaModel>
 }
 
+export type FloatFilter<$PrismaModel = never> = {
+  equals?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  in?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel>
+  notIn?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel>
+  lt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  lte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedFloatFilter<$PrismaModel> | number
+}
+
+export type EnumObservationStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.ObservationStatus | Prisma.EnumObservationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ObservationStatus[] | Prisma.ListEnumObservationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ObservationStatus[] | Prisma.ListEnumObservationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumObservationStatusFilter<$PrismaModel> | $Enums.ObservationStatus
+}
+
+export type FloatWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  in?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel>
+  notIn?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel>
+  lt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  lte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedFloatWithAggregatesFilter<$PrismaModel> | number
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _avg?: Prisma.NestedFloatFilter<$PrismaModel>
+  _sum?: Prisma.NestedFloatFilter<$PrismaModel>
+  _min?: Prisma.NestedFloatFilter<$PrismaModel>
+  _max?: Prisma.NestedFloatFilter<$PrismaModel>
+}
+
+export type EnumObservationStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ObservationStatus | Prisma.EnumObservationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ObservationStatus[] | Prisma.ListEnumObservationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ObservationStatus[] | Prisma.ListEnumObservationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumObservationStatusWithAggregatesFilter<$PrismaModel> | $Enums.ObservationStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumObservationStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumObservationStatusFilter<$PrismaModel>
+}
+
 export type NestedIntFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel>
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
@@ -503,6 +547,39 @@ export type NestedEnumValidationStatusWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumValidationStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumValidationStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumObservationStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.ObservationStatus | Prisma.EnumObservationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ObservationStatus[] | Prisma.ListEnumObservationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ObservationStatus[] | Prisma.ListEnumObservationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumObservationStatusFilter<$PrismaModel> | $Enums.ObservationStatus
+}
+
+export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  in?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel>
+  notIn?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel>
+  lt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  lte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedFloatWithAggregatesFilter<$PrismaModel> | number
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _avg?: Prisma.NestedFloatFilter<$PrismaModel>
+  _sum?: Prisma.NestedFloatFilter<$PrismaModel>
+  _min?: Prisma.NestedFloatFilter<$PrismaModel>
+  _max?: Prisma.NestedFloatFilter<$PrismaModel>
+}
+
+export type NestedEnumObservationStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ObservationStatus | Prisma.EnumObservationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.ObservationStatus[] | Prisma.ListEnumObservationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ObservationStatus[] | Prisma.ListEnumObservationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumObservationStatusWithAggregatesFilter<$PrismaModel> | $Enums.ObservationStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumObservationStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumObservationStatusFilter<$PrismaModel>
 }
 
 

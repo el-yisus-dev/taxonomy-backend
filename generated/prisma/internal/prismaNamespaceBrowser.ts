@@ -54,7 +54,9 @@ export const ModelName = {
   User: 'User',
   EmailVerificationToken: 'EmailVerificationToken',
   PasswordResetToken: 'PasswordResetToken',
-  Taxon: 'Taxon'
+  Taxon: 'Taxon',
+  Observation: 'Observation',
+  ObservationImage: 'ObservationImage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -131,6 +133,34 @@ export const TaxonScalarFieldEnum = {
 } as const
 
 export type TaxonScalarFieldEnum = (typeof TaxonScalarFieldEnum)[keyof typeof TaxonScalarFieldEnum]
+
+
+export const ObservationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  description: 'description',
+  observedAt: 'observedAt',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  placeName: 'placeName',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type ObservationScalarFieldEnum = (typeof ObservationScalarFieldEnum)[keyof typeof ObservationScalarFieldEnum]
+
+
+export const ObservationImageScalarFieldEnum = {
+  id: 'id',
+  observationId: 'observationId',
+  url: 'url',
+  providerId: 'providerId',
+  createdAt: 'createdAt'
+} as const
+
+export type ObservationImageScalarFieldEnum = (typeof ObservationImageScalarFieldEnum)[keyof typeof ObservationImageScalarFieldEnum]
 
 
 export const SortOrder = {

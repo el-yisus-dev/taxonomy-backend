@@ -2,6 +2,7 @@ import { Router, type Express } from "express"
 
 import authRouter from "./auth.routes.js";
 import taxonRouter from "./taxon.routes.js";
+import observationsRouter from "./observation.routes.js";
 import userRouter from "./user.routes.js";
 import { ApiError } from "../utils/ApiError.js";
 
@@ -23,6 +24,7 @@ const routerApi = (app: Express) => {
 
     router.use("/auth", authRouter);
     router.use("/taxons", taxonRouter);
+    router.use("/observations", observationsRouter);
     router.use("/users", userRouter);
 
     app.use((req, res, next) => {

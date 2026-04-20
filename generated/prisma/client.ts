@@ -61,3 +61,13 @@ export type PasswordResetToken = Prisma.PasswordResetTokenModel
  * 
  */
 export type Taxon = Prisma.TaxonModel
+/**
+ * Model Observation
+ * 
+ */
+export type Observation = Prisma.ObservationModel
+/**
+ * Model ObservationImage
+ * 
+ */
+export type ObservationImage = Prisma.ObservationImageModel

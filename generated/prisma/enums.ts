@@ -9,6 +9,15 @@
 * 🟢 You can import this file directly.
 */
 
+export const ObservationStatus = {
+  CASUAL: 'CASUAL',
+  NEEDS_ID: 'NEEDS_ID',
+  IDENTIFIED: 'IDENTIFIED'
+} as const
+
+export type ObservationStatus = (typeof ObservationStatus)[keyof typeof ObservationStatus]
+
+
 export const TaxonRank = {
   DOMAIN: 'DOMAIN',
   KINGDOM: 'KINGDOM',
