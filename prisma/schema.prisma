@@ -100,6 +100,30 @@ model Taxon {
   @@index([deletedAt])
 }
 
+model TaxonSuggestion {
+  id          Int @id @default(autoincrement())
+
+  name        String
+  rank        TaxonRank?
+  parentId    Int?
+
+  createdBy   Int
+  user        User @relation(fields: [createdBy], references: [id])
+
+  status      SuggestionStatus @default(PENDING)
+
+  createdAt   DateTime @default(now())
+  reviewedAt  DateTime?
+
+  taxonId     Int?
+  taxon       Taxon? @relation(fields: [taxonId], references: [id])
+
+  identifications Identification[]
+
+  @@index([name])
+  @@index([parentId])
+}
+
 model Observation {
   id          Int      @id @default(autoincrement())
 
@@ -143,6 +167,30 @@ model ObservationImage {
   @@index([observationId])
 }
 
+model Identification {
+  id                 Int @id @default(autoincrement())
+
+  observationId      Int
+  observation        Observation @relation(fields: [observationId], references: [id])
+
+  userId             Int
+  user               User @relation(fields: [userId], references: [id])
+
+  taxonId            Int?
+  taxon              Taxon? @relation(fields: [taxonId], references: [id])
+
+  taxonSuggestionId  Int?
+  taxonSuggestion    TaxonSuggestion? @relation(fields: [taxonSuggestionId], references: [id])
+
+  confidence         Int?
+
+  createdAt          DateTime @default(now())
+
+  @@index([observationId])
+  @@index([taxonId])
+  @@index([taxonSuggestionId])
+}
+
 enum ObservationStatus {
   CASUAL
   NEEDS_ID
@@ -161,6 +209,12 @@ enum TaxonRank {
 }
 
 enum ValidationStatus {
+  PENDING
+  VALIDATED
+  REJECTED
+}
+
+enum SuggestionStatus {
   PENDING
   VALIDATED
   REJECTED
