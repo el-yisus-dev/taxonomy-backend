@@ -1,5 +1,4 @@
 import { prisma } from "../lib/prisma.js"
-import type { updateUserDTO } from "../types/User.js";
 
 export const createUser = async (data: {
   email: string
@@ -52,6 +51,7 @@ export const findUserWithPassword = async (identifier: string) => {
       avatarUrl: true,
       role: true,
       password: true,
+      emailVerified: true
     },
   });
 
@@ -120,7 +120,8 @@ export const updateUser = async (id: number, data: Partial<{ name: string; lastN
 export const updateLastLoginDate = async (id: number) => {
   return prisma.user.update({
     where: {
-      id
+      id,
+      deletedAt: null
     },
     data: {
       lastLoginAt: new Date()
@@ -140,3 +141,35 @@ export const softDeleteUser = async (id: number) => {
     }
   })
 };
+
+export const updateUserVerified = async (userId: number) => {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { 
+      emailVerified: true
+     },
+  });
+}
+
+export const findUserByEmail = (email: string) => {
+  return prisma.user.findFirst({
+    where: {
+      email,
+      deletedAt: null,
+      isActive: true
+    }
+  })
+}
+
+export const updateUserPassword = (userId: number, password: string) => {
+  return prisma.user.update({
+    where: {
+      id: userId,
+      deletedAt: null,
+      isActive: true
+    },
+    data: {
+      password
+    }
+  })
+}

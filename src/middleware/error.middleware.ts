@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express"
 import { ApiError } from "../utils/ApiError.js"
+import { config } from "../config/config.js"
 
 export const errorMiddleware = (
   err: Error | ApiError,
@@ -28,6 +29,10 @@ export const errorMiddleware = (
       status: "error",
       message: "Invalid token"
     })
+  }
+
+  if (config.NODE_ENV === "development") {
+    console.log(err);
   }
 
   return res.status(500).json({

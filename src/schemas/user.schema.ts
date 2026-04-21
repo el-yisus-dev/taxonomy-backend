@@ -66,15 +66,3 @@ export const updateUserSchema = z.object({
   message: "You must provide at least one field to update"
 })
 .strict()
-
-// LOGIN
-export const loginUserSchema = z.object({
-  identifier: z
-    .string({ error: "Username or email is required" })
-    .trim()
-    .min(1, { error: "Username or email is required" }),
-
-  password: z
-    .string({ error: "Password is required" })
-    .min(1, { error: "Password is required" })
-})

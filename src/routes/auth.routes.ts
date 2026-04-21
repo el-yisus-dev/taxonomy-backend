@@ -1,8 +1,10 @@
 import { Router } from "express";
+
 import { validate } from "../middleware/validate.middleware.js";
-import { loginUserSchema } from "../schemas/user.schema.js";
+import { login, requestPasswordReset, resendVerification, resetPassword, verifyEmail } from "../controllers/auth.controller.js";
+import { emailTokenSchema, loginUserSchema, paramEmailTokenSchema, resetPasswordSchema } from "../schemas/auth.schema.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
-import { login } from "../controllers/auth.controller.js";
+import { sentEmailsRateLimiter } from "../middleware/rateLimit.middleware.js";
 
 
 /**
@@ -108,6 +110,165 @@ const router = Router();
  */
 router.post("/login", validate(loginUserSchema), asyncHandler(login));
 
+/**
+ * @swagger
+ * /auth/email-verification/confirm:
+ *   get:
+ *     summary: Verify user email using verification token
+ *     description: |
+ *       Verifies a user's email address using a token sent via email during registration.
+ *       The token must be valid and not expired.
+ *
+ *     tags:
+ *       - Auth
+ *
+ *     parameters:
+ *       - in: query
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Email verification token
+ *         example: 9f8c7a6b5e4d3c2b1a...
+ *
+ *     responses:
+ *       200:
+ *         description: Email successfully verified
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Email verified successfully
+ *
+ *       400:
+ *         description: Invalid or expired token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Invalid or expired token
+ *
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/email-verification/confirm", sentEmailsRateLimiter, validate(paramEmailTokenSchema, "query"), asyncHandler(verifyEmail))
+
+/**
+ * @swagger
+ * /auth/email-verification/resend:
+ *   post:
+ *     summary: Resend email verification token
+ *     description: Sends a new email verification token if the user is not yet verified
+ *     tags:
+ *       - Auth
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *
+ *     responses:
+ *       200:
+ *         description: Verification email sent
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Verification email sent
+ *
+ *       400:
+ *         description: Email already verified or invalid
+ *
+ *       500:
+ *         description: Internal server error
+ */
+router.post("/email-verification/resend", sentEmailsRateLimiter, validate(emailTokenSchema), asyncHandler(resendVerification))
+
+/**
+ * @swagger
+ * /auth/password-reset/request:
+ *   post:
+ *     summary: Request password reset
+ *     description: Sends an OTP code to the user's email
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         description: OTP sent
+ */
+router.post("/password-reset/request", sentEmailsRateLimiter, validate(emailTokenSchema), asyncHandler(requestPasswordReset))
+
+/**
+ * @swagger
+ * /auth/password-reset/confirm:
+ *   post:
+ *     summary: Reset user password using OTP
+ *     description: Validates OTP and updates password
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - code
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *               code:
+ *                 type: string
+ *                 example: "123456"
+ *               password:
+ *                 type: string
+ *                 example: newpassword123
+ *     responses:
+ *       200:
+ *         description: Password updated successfully
+ */
+router.post("/password-reset/confirm", validate(resetPasswordSchema), asyncHandler(resetPassword))
 
 
 export default router;

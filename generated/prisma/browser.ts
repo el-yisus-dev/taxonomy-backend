@@ -23,7 +23,27 @@ export * from './enums.js';
  */
 export type User = Prisma.UserModel
 /**
+ * Model EmailVerificationToken
+ * 
+ */
+export type EmailVerificationToken = Prisma.EmailVerificationTokenModel
+/**
+ * Model PasswordResetToken
+ * 
+ */
+export type PasswordResetToken = Prisma.PasswordResetTokenModel
+/**
  * Model Taxon
  * 
  */
 export type Taxon = Prisma.TaxonModel
+/**
+ * Model Observation
+ * 
+ */
+export type Observation = Prisma.ObservationModel
+/**
+ * Model ObservationImage
+ * 
+ */
+export type ObservationImage = Prisma.ObservationImageModel

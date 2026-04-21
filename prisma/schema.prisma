@@ -31,12 +31,47 @@ model User {
 
   taxa      Taxon[]
 
+  emailVerificationTokens EmailVerificationToken[]
+  passwordResetTokens PasswordResetToken[]
+  observations Observation[] 
+
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
 
   @@index([email])
   @@index([username])
+}
+
+model EmailVerificationToken {
+  id        Int      @id @default(autoincrement())
+
+  token     String
+  userId    Int
+
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([token])
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+
+  token     String
+  userId    Int
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([token])
 }
 
 model Taxon {
@@ -65,6 +100,103 @@ model Taxon {
   @@index([deletedAt])
 }
 
+model TaxonSuggestion {
+  id          Int @id @default(autoincrement())
+
+  name        String
+  rank        TaxonRank?
+  parentId    Int?
+
+  createdBy   Int
+  user        User @relation(fields: [createdBy], references: [id])
+
+  status      SuggestionStatus @default(PENDING)
+
+  createdAt   DateTime @default(now())
+  reviewedAt  DateTime?
+
+  taxonId     Int?
+  taxon       Taxon? @relation(fields: [taxonId], references: [id])
+
+  identifications Identification[]
+
+  @@index([name])
+  @@index([parentId])
+}
+
+model Observation {
+  id          Int      @id @default(autoincrement())
+
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+
+  description String?
+  observedAt  DateTime
+
+  latitude    Float
+  longitude   Float
+
+  placeName   String?
+
+  status      ObservationStatus @default(NEEDS_ID)
+
+  images      ObservationImage[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  @@index([userId])
+  @@index([latitude])
+  @@index([longitude])
+  @@index([observedAt])
+  @@index([status])
+}
+
+model ObservationImage {
+  id            Int @id @default(autoincrement())
+
+  observationId Int
+  observation   Observation @relation(fields: [observationId], references: [id], onDelete: Cascade)
+
+  url           String
+  providerId    String?
+
+  createdAt     DateTime @default(now())
+
+  @@index([observationId])
+}
+
+model Identification {
+  id                 Int @id @default(autoincrement())
+
+  observationId      Int
+  observation        Observation @relation(fields: [observationId], references: [id])
+
+  userId             Int
+  user               User @relation(fields: [userId], references: [id])
+
+  taxonId            Int?
+  taxon              Taxon? @relation(fields: [taxonId], references: [id])
+
+  taxonSuggestionId  Int?
+  taxonSuggestion    TaxonSuggestion? @relation(fields: [taxonSuggestionId], references: [id])
+
+  confidence         Int?
+
+  createdAt          DateTime @default(now())
+
+  @@index([observationId])
+  @@index([taxonId])
+  @@index([taxonSuggestionId])
+}
+
+enum ObservationStatus {
+  CASUAL
+  NEEDS_ID
+  IDENTIFIED
+}
+
 enum TaxonRank {
   DOMAIN
   KINGDOM
@@ -77,6 +209,12 @@ enum TaxonRank {
 }
 
 enum ValidationStatus {
+  PENDING
+  VALIDATED
+  REJECTED
+}
+
+enum SuggestionStatus {
   PENDING
   VALIDATED
   REJECTED

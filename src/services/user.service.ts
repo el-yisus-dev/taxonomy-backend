@@ -1,9 +1,13 @@
 import bcrypt from "bcrypt";
 
 import * as userRepository from "../repositories/user.repository.js";
+import * as emailVerificationRepository from "../repositories/emailVerification.repository.js";
 import { ApiError } from "../utils/ApiError.js";
 import { getTotalPages } from "../utils/Pagination.js";
+import { generateToken, hashToken } from "../utils/TokenEmail.js";
+import { sendVerificationEmail } from "./email.service.js";
 import type { CreateUserDTO, updateUserDTO } from "../types/User.js";
+import { hashPassword } from "../utils/Hashpassord.js";
 
 
 export const createUser = async (data: CreateUserDTO) => {
@@ -20,12 +24,27 @@ export const createUser = async (data: CreateUserDTO) => {
     throw new ApiError(409, "Username already taken")
   }
 
-  const hashedPassword = await bcrypt.hash(data.password, 10)
+  const hashedPassword = await hashPassword(data.password);
 
   const user = await userRepository.createUser({
     ...data,
     password: hashedPassword
   })
+  
+  await emailVerificationRepository.deleteUserTokensRecords(user.id);
+
+  const rawToken = generateToken();
+  const hashedToken = hashToken(rawToken);
+
+  const emailVerificationData = {
+    token: hashedToken,
+    userId: user.id,
+    expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+  }
+
+  await emailVerificationRepository.createEmailVerificationRecord({...emailVerificationData})
+
+  await sendVerificationEmail(user, rawToken);
   
   const { password , ...safeUser } = user;
 

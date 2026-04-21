@@ -52,7 +52,11 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
-  Taxon: 'Taxon'
+  EmailVerificationToken: 'EmailVerificationToken',
+  PasswordResetToken: 'PasswordResetToken',
+  Taxon: 'Taxon',
+  Observation: 'Observation',
+  ObservationImage: 'ObservationImage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -92,6 +96,29 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const EmailVerificationTokenScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  userId: 'userId',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type EmailVerificationTokenScalarFieldEnum = (typeof EmailVerificationTokenScalarFieldEnum)[keyof typeof EmailVerificationTokenScalarFieldEnum]
+
+
+export const PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  userId: 'userId',
+  attempts: 'attempts',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
+
+
 export const TaxonScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -106,6 +133,34 @@ export const TaxonScalarFieldEnum = {
 } as const
 
 export type TaxonScalarFieldEnum = (typeof TaxonScalarFieldEnum)[keyof typeof TaxonScalarFieldEnum]
+
+
+export const ObservationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  description: 'description',
+  observedAt: 'observedAt',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  placeName: 'placeName',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type ObservationScalarFieldEnum = (typeof ObservationScalarFieldEnum)[keyof typeof ObservationScalarFieldEnum]
+
+
+export const ObservationImageScalarFieldEnum = {
+  id: 'id',
+  observationId: 'observationId',
+  url: 'url',
+  providerId: 'providerId',
+  createdAt: 'createdAt'
+} as const
+
+export type ObservationImageScalarFieldEnum = (typeof ObservationImageScalarFieldEnum)[keyof typeof ObservationImageScalarFieldEnum]
 
 
 export const SortOrder = {
